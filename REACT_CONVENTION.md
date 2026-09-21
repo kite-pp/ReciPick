@@ -24,36 +24,41 @@
 
 ```text
 main
-├── feature/recipe-search
-├── feature/fridge
-├── feature/recommendation
-└── feature/detail-favorite
+└── develop
+    ├── feature/recipe-search
+    ├── feature/fridge
+    ├── feature/recommendation
+    └── feature/detail-favorite
 ```
+
+- `main`: 배포 가능한 안정 버전
+- `develop`: 다음 배포를 위한 통합 브랜치
+- 작업 브랜치: 최신 `develop`에서 생성하고 `develop` 대상으로 Pull Request를 작성한다.
 
 ### 브랜치 이름 규칙
 
-| Prefix | 용도 | 예시 |
-|---|---|---|
-| `feature/` | 새로운 기능 구현 | `feature/fridge` |
-| `fix/` | 버그 수정 | `fix/favorite-storage` |
+| Prefix      | 용도                     | 예시                   |
+| ----------- | ------------------------ | ---------------------- |
+| `feature/`  | 새로운 기능 구현         | `feature/fridge`       |
+| `fix/`      | 버그 수정                | `fix/favorite-storage` |
 | `refactor/` | 기능 변경 없는 코드 개선 | `refactor/recipe-card` |
-| `style/` | CSS/UI 수정 | `style/home-layout` |
-| `chore/` | 설정, 패키지, 환경 작업 | `chore/router-setup` |
+| `style/`    | CSS/UI 수정              | `style/home-layout`    |
+| `chore/`    | 설정, 패키지, 환경 작업  | `chore/router-setup`   |
 
 ### 작업 시작 전
 
 ```bash
-git switch main
-git pull origin main
+git switch develop
+git pull origin develop
 git switch 작업브랜치
-git merge main
+git merge develop
 ```
 
 새 브랜치를 생성하는 경우:
 
 ```bash
-git switch main
-git pull origin main
+git switch develop
+git pull origin develop
 git switch -c feature/기능명
 ```
 
@@ -69,15 +74,15 @@ type: 내용
 
 ### Type
 
-| Type | 의미 | 예시 |
-|---|---|---|
-| `feat` | 기능 추가 | `feat: 냉장고 재료 추가 기능 구현` |
-| `fix` | 오류 수정 | `fix: 찜 목록 중복 저장 오류 수정` |
-| `style` | UI/CSS 수정 | `style: 레시피 카드 간격 수정` |
+| Type       | 의미           | 예시                                 |
+| ---------- | -------------- | ------------------------------------ |
+| `feat`     | 기능 추가      | `feat: 냉장고 재료 추가 기능 구현`   |
+| `fix`      | 오류 수정      | `fix: 찜 목록 중복 저장 오류 수정`   |
+| `style`    | UI/CSS 수정    | `style: 레시피 카드 간격 수정`       |
 | `refactor` | 코드 구조 개선 | `refactor: 추천 계산 로직 함수 분리` |
-| `chore` | 프로젝트 설정 | `chore: react-router-dom 설치` |
-| `docs` | 문서 수정 | `docs: README 역할분담 추가` |
-| `data` | Mock Data 수정 | `data: 레시피 목데이터 추가` |
+| `chore`    | 프로젝트 설정  | `chore: react-router-dom 설치`       |
+| `docs`     | 문서 수정      | `docs: README 역할분담 추가`         |
+| `data`     | Mock Data 수정 | `data: 레시피 목데이터 추가`         |
 
 ### 좋은 예시
 
@@ -123,16 +128,19 @@ git push origin feature/fridge
 
 ```md
 ## 작업 내용
+
 - 식재료 추가 기능 구현
 - 식재료 삭제 기능 구현
 - 수량 증가/감소 기능 구현
 - localStorage 저장 적용
 
 ## 확인 사항
+
 - 새로고침 후에도 식재료 유지
 - 최소 수량 1 미만으로 내려가지 않도록 처리
 
 ## 관련 화면
+
 - /fridge
 ```
 
@@ -182,15 +190,15 @@ src/
 
 ### 폴더 역할
 
-| 폴더 | 역할 |
-|---|---|
-| `components` | 재사용 가능한 UI 컴포넌트 |
-| `pages` | Router에 직접 연결되는 페이지 |
-| `data` | JSON Mock Data |
-| `contexts` | 전역 상태 관리 |
-| `hooks` | 재사용할 Custom Hook |
-| `utils` | 계산/정렬/추천 등 순수 함수 |
-| `assets` | 이미지 및 정적 파일 |
+| 폴더         | 역할                          |
+| ------------ | ----------------------------- |
+| `components` | 재사용 가능한 UI 컴포넌트     |
+| `pages`      | Router에 직접 연결되는 페이지 |
+| `data`       | JSON Mock Data                |
+| `contexts`   | 전역 상태 관리                |
+| `hooks`      | 재사용할 Custom Hook          |
+| `utils`      | 계산/정렬/추천 등 순수 함수   |
+| `assets`     | 이미지 및 정적 파일           |
 
 ---
 
@@ -282,8 +290,8 @@ Props로 이벤트 함수를 전달할 때는 `on + 행동`을 사용한다.
 - 배열은 가능하면 복수형 사용
 
 ```js
-const searchKeyword = "";
-const selectedCategory = "전체";
+const searchKeyword = '';
+const selectedCategory = '전체';
 const favoriteRecipes = [];
 const fridgeIngredients = [];
 const isFavorite = true;
@@ -305,8 +313,8 @@ const data2 = [];
 State 이름과 setter를 일치시킨다.
 
 ```jsx
-const [searchKeyword, setSearchKeyword] = useState("");
-const [selectedCategory, setSelectedCategory] = useState("전체");
+const [searchKeyword, setSearchKeyword] = useState('');
+const [selectedCategory, setSelectedCategory] = useState('전체');
 const [isModalOpen, setIsModalOpen] = useState(false);
 ```
 
@@ -362,11 +370,7 @@ const filteredRecipes = recipes.filter(...);
       "amount": "1공기"
     }
   ],
-  "steps": [
-    "김치를 먹기 좋은 크기로 자른다.",
-    "팬에 김치를 볶는다.",
-    "밥을 넣고 함께 볶는다."
-  ]
+  "steps": ["김치를 먹기 좋은 크기로 자른다.", "팬에 김치를 볶는다.", "밥을 넣고 함께 볶는다."]
 }
 ```
 
@@ -394,10 +398,7 @@ fridgeChef.recentRecipes
 예:
 
 ```js
-localStorage.setItem(
-  "fridgeChef.favorites",
-  JSON.stringify(favorites)
-);
+localStorage.setItem('fridgeChef.favorites', JSON.stringify(favorites));
 ```
 
 가능하면 Key 문자열은 상수로 관리한다.
@@ -458,11 +459,16 @@ export function getMissingIngredients(recipe, fridgeIngredients) {
 클래스명 예시:
 
 ```css
-.recipe-card {}
-.recipe-card__image {}
-.recipe-card__title {}
-.recipe-card__meta {}
-.recipe-card__favorite-button {}
+.recipe-card {
+}
+.recipe-card__image {
+}
+.recipe-card__title {
+}
+.recipe-card__meta {
+}
+.recipe-card__favorite-button {
+}
 ```
 
 ---
@@ -473,18 +479,18 @@ export function getMissingIngredients(recipe, fridgeIngredients) {
 
 ```jsx
 // 1. React / 외부 라이브러리
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 // 2. 내부 Component
-import RecipeCard from "../components/recipe/RecipeCard";
+import RecipeCard from '../components/recipe/RecipeCard';
 
 // 3. Data / Utils
-import recipes from "../data/recipes.json";
-import { calculateMatchRate } from "../utils/recommendation";
+import recipes from '../data/recipes.json';
+import { calculateMatchRate } from '../utils/recommendation';
 
 // 4. CSS
-import "./RecipeListPage.css";
+import './RecipeListPage.css';
 ```
 
 사용하지 않는 import는 제거한다.
@@ -523,12 +529,12 @@ const recipes = [];
 
 ## 19. 담당 영역
 
-| 담당 | 주요 영역 |
-|---|---|
-| 1 | 홈 / 레시피 탐색 / 검색 / 필터 / 정렬 |
-| 2 | 내 냉장고 / 식재료 추가·삭제 / localStorage |
-| 3 | 맞춤 추천 / 일치율 / 부족 재료 / 랜덤 추천 |
-| 4 | 레시피 상세 / Router / 찜 / 찜 목록 |
+| 담당 | 주요 영역                                   |
+| ---- | ------------------------------------------- |
+| 1    | 홈 / 레시피 탐색 / 검색 / 필터 / 정렬       |
+| 2    | 내 냉장고 / 식재료 추가·삭제 / localStorage |
+| 3    | 맞춤 추천 / 일치율 / 부족 재료 / 랜덤 추천  |
+| 4    | 레시피 상세 / Router / 찜 / 찜 목록         |
 
 담당 영역 밖의 공통 코드를 수정할 경우 관련 담당자에게 공유한다.
 

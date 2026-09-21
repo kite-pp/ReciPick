@@ -1,11 +1,11 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from 'react-router-dom';
 
-import HomePage from "./pages/HomePage.jsx";
-import RecipeListPage from "./pages/RecipeListPage.jsx";
-import RecipeDetailPage from "./pages/RecipeDetailPage.jsx";
-import FridgePage from "./pages/FridgePage.jsx";
-import RecommendPage from "./pages/RecommendPage.jsx";
-import FavoritesPage from "./pages/FavoritesPage.jsx";
+import HomePage from './pages/HomePage.jsx';
+import RecipeListPage from './pages/RecipeListPage.jsx';
+import RecipeDetailPage from './pages/RecipeDetailPage.jsx';
+import FridgePage from './pages/FridgePage.jsx';
+import RecommendPage from './pages/RecommendPage.jsx';
+import FavoritesPage from './pages/FavoritesPage.jsx';
 
 function App() {
   return (

@@ -1,0 +1,24 @@
+language: ko-KR
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  poem: false
+  path_filters:
+    - '!dist/**'
+    - '!pnpm-lock.yaml'
+  path_instructions:
+    - path: 'src/**/*.{js,jsx,css}'
+      instructions: >-
+        REACT_CONVENTION.md의 컴포넌트, 이름, 상태, 라우팅, CSS, import 규칙을 기준으로
+        정확성, 접근성, 유지보수성 문제를 검토하세요.
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - develop
+
+chat:
+  auto_reply: true

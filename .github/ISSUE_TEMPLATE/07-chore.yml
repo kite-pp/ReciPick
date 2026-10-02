@@ -1,0 +1,40 @@
+name: '🔧 설정·환경 작업'
+description: '패키지, 빌드, CI/CD 또는 저장소 설정을 변경합니다.'
+title: '[CHORE] '
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: 작업 영역
+      options:
+        - 패키지 및 의존성
+        - ESLint·Prettier
+        - Vite
+        - GitHub Actions
+        - Vercel
+        - 저장소 설정
+        - 기타
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 목적
+      description: 설정을 변경하는 이유와 기대 효과를 작성해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 작업 항목
+      placeholder: |
+        - [ ] 설정 파일 수정
+        - [ ] 로컬 검증
+        - [ ] CI 확인
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: 영향 및 복구 방법
+      description: 빌드·배포 영향과 문제가 생겼을 때 되돌리는 방법을 작성해 주세요.

@@ -1,0 +1,42 @@
+name: '💬 기술 논의'
+description: '구조, 규칙 또는 구현 방향에 대한 팀 결정을 요청합니다.'
+title: '[DISCUSS] '
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: 논의 배경
+      description: 결정이 필요한 상황과 현재 제약을 작성해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: 선택지
+      description: 가능한 선택지와 각각의 장단점을 작성해 주세요.
+      placeholder: |
+        1. 선택지 A
+           - 장점:
+           - 단점:
+        2. 선택지 B
+           - 장점:
+           - 단점:
+    validations:
+      required: true
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: 제안
+      description: 작성자가 선호하는 선택지와 근거를 작성해 주세요.
+  - type: textarea
+    id: impact
+    attributes:
+      label: 영향 범위
+      description: 일정, 데이터 구조, 공통 컴포넌트, 문서에 미치는 영향을 작성해 주세요.
+    validations:
+      required: true
+  - type: input
+    id: deadline
+    attributes:
+      label: 결정 기한
+      placeholder: 'YYYY-MM-DD'

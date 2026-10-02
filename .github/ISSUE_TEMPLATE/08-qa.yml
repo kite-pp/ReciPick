@@ -1,0 +1,41 @@
+name: '🧪 QA·테스트'
+description: '수동 QA, 교차 테스트 또는 회귀 검증 작업을 기록합니다.'
+title: '[TEST] '
+body:
+  - type: input
+    id: target
+    attributes:
+      label: 테스트 대상
+      placeholder: '추천 화면 및 localStorage 유지'
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 테스트 환경
+      placeholder: 'Production URL / Chrome / macOS'
+    validations:
+      required: true
+  - type: textarea
+    id: scenarios
+    attributes:
+      label: 테스트 시나리오
+      placeholder: |
+        - [ ] 정상 데이터
+        - [ ] 빈 데이터
+        - [ ] 새로고침
+        - [ ] 페이지 이동
+        - [ ] localStorage 유지
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: 테스트 결과 및 발견 사항
+      description: 실행 후 결과, 스크린샷, 후속 이슈를 작성해 주세요.

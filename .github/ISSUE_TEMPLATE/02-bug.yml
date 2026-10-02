@@ -1,0 +1,56 @@
+name: '🐛 버그 신고'
+description: '재현 가능한 오류나 예상과 다른 동작을 보고합니다.'
+title: '[BUG] '
+labels:
+  - bug
+body:
+  - type: checkboxes
+    id: duplicate
+    attributes:
+      label: 중복 확인
+      options:
+        - label: 기존 이슈에서 동일한 문제를 찾지 못했습니다.
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: 문제 설명
+      description: 어떤 문제가 발생했는지 간단하고 명확하게 작성해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1. /fridge로 이동한다.
+        2. 재료를 추가한다.
+        3. 새로고침한다.
+        4. 재료가 사라진다.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 결과
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 실행 환경
+      description: 브라우저, 운영체제, 배포 URL 또는 브랜치를 작성해 주세요.
+      placeholder: 'Chrome 140 / macOS / main'
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 스크린샷 및 로그
+      description: 개인정보와 비밀 값은 제거한 뒤 첨부해 주세요.

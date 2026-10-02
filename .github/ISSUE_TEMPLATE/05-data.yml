@@ -1,0 +1,42 @@
+name: '🗂️ Mock Data'
+description: '레시피, 재료 또는 공통 상수 데이터를 추가·수정합니다.'
+title: '[DATA] '
+body:
+  - type: dropdown
+    id: data_type
+    attributes:
+      label: 데이터 종류
+      options:
+        - recipes.js
+        - ingredients.js
+        - constants.js
+        - 이미지 자산
+        - 데이터 스키마
+    validations:
+      required: true
+  - type: textarea
+    id: changes
+    attributes:
+      label: 변경 내용
+      description: 추가·수정·삭제할 데이터와 예상 개수를 작성해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: schema
+    attributes:
+      label: 스키마 영향
+      description: 필드명, 타입, ingredientId 연결 구조의 변경 여부를 작성해 주세요.
+      placeholder: '스키마 변경 없음'
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 데이터 검증
+      options:
+        - label: ID 중복 여부를 확인합니다.
+          required: true
+        - label: 레시피의 ingredientId가 실제 재료와 연결되는지 확인합니다.
+          required: true
+        - label: 이미지 경로와 상수 값을 확인합니다.
+          required: true

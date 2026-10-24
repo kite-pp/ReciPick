@@ -1,579 +1,184 @@
 # React 프로젝트 컨벤션
 
-> 프로젝트: 보유 식재료 기반 레시피 추천 서비스  
-> 기술 스택: React + Vite + JavaScript + React Router + Context API + JSON Mock Data + localStorage
-
----
+> JavaScript + React 19 + Vite 8 + React Router 7 기준입니다. 앱 계층과 파일 배치는 [애플리케이션 구조](./docs/APP_STRUCTURE.md)를 함께 따릅니다.
 
 ## 1. 기본 원칙
 
-- `main` 브랜치는 항상 실행 가능한 상태를 유지한다.
-- 기능 단위로 브랜치를 생성해 작업한다.
-- 한 커밋에는 가능한 한 하나의 목적만 담는다.
-- 공통 컴포넌트와 데이터 구조를 임의로 변경하지 않는다.
-- 공통 구조를 변경해야 할 경우 팀원과 먼저 공유한다.
-- 컴포넌트는 가능한 한 한 가지 역할만 담당하도록 작성한다.
-- 페이지에 모든 로직을 몰아넣지 않고 재사용 가능한 로직은 분리한다.
-- Mock Data의 필드명과 타입은 팀 전체가 동일하게 사용한다.
+- 컴포넌트는 한 가지 역할에 집중합니다.
+- 페이지에 모든 로직을 넣지 않고 재사용 로직은 `hooks` 또는 `utils`로 분리합니다.
+- 공통 상수는 문자열을 중복하지 않고 `constants`에서 관리합니다.
+- 여러 화면에서 공유하는 상태만 Context API로 관리합니다.
+- 서버 연동 전 데이터는 JavaScript Mock Data로 관리합니다.
+- 변경 범위를 작게 유지하고 한 커밋에는 하나의 목적을 담습니다.
 
----
+## 2. Git 작업 순서
 
-## 2. Git 브랜치 전략
+모든 작업은 다음 순서를 지킵니다.
 
-### 기본 브랜치
+1. GitHub Issue 생성
+2. 최신 `develop`에서 작업 브랜치 생성
+3. 구현 및 로컬 검증
+4. Convention에 맞는 커밋 생성
+5. 작업 브랜치 Push
+6. `develop` 대상 Pull Request 생성
+7. PR 본문에 `Close #이슈번호` 작성
+8. 리뷰와 CI 확인 후 병합
+9. 병합된 작업 브랜치 삭제
 
-```text
-main
-└── develop
-    ├── feature/recipe-search
-    ├── feature/fridge
-    ├── feature/recommendation
-    └── feature/detail-favorite
-```
+`main`과 `develop`에는 직접 Push하지 않습니다. `main`은 배포 가능한 안정 버전, `develop`은 다음 배포를 위한 통합 브랜치입니다.
 
-- `main`: 배포 가능한 안정 버전
-- `develop`: 다음 배포를 위한 통합 브랜치
-- 작업 브랜치: 최신 `develop`에서 생성하고 `develop` 대상으로 Pull Request를 작성한다.
-
-### 브랜치 이름 규칙
-
-| Prefix      | 용도                     | 예시                   |
-| ----------- | ------------------------ | ---------------------- |
-| `feature/`  | 새로운 기능 구현         | `feature/fridge`       |
-| `fix/`      | 버그 수정                | `fix/favorite-storage` |
-| `refactor/` | 기능 변경 없는 코드 개선 | `refactor/recipe-card` |
-| `style/`    | CSS/UI 수정              | `style/home-layout`    |
-| `chore/`    | 설정, 패키지, 환경 작업  | `chore/router-setup`   |
-
-### 작업 시작 전
-
-```bash
-git switch develop
-git pull origin develop
-git switch 작업브랜치
-git merge develop
-```
-
-새 브랜치를 생성하는 경우:
-
-```bash
-git switch develop
-git pull origin develop
-git switch -c feature/기능명
-```
-
----
-
-## 3. Commit Message 규칙
-
-### 형식
+### 브랜치 이름
 
 ```text
-type: 내용
+type/이슈번호-작업명
 ```
 
-### Type
+| Prefix      | 용도                     | 예시                          |
+| ----------- | ------------------------ | ----------------------------- |
+| `feature/`  | 새로운 기능              | `feature/21-recipe-search`    |
+| `fix/`      | 버그 수정                | `fix/24-favorite-storage`     |
+| `refactor/` | 동작 변경 없는 구조 개선 | `refactor/27-recipe-card`     |
+| `style/`    | UI/CSS 수정              | `style/30-home-layout`        |
+| `chore/`    | 설정, 문서, 환경 작업    | `chore/14-docs-app-structure` |
 
-| Type       | 의미           | 예시                                 |
-| ---------- | -------------- | ------------------------------------ |
-| `feat`     | 기능 추가      | `feat: 냉장고 재료 추가 기능 구현`   |
-| `fix`      | 오류 수정      | `fix: 찜 목록 중복 저장 오류 수정`   |
-| `style`    | UI/CSS 수정    | `style: 레시피 카드 간격 수정`       |
-| `refactor` | 코드 구조 개선 | `refactor: 추천 계산 로직 함수 분리` |
-| `chore`    | 프로젝트 설정  | `chore: react-router-dom 설치`       |
-| `docs`     | 문서 수정      | `docs: README 역할분담 추가`         |
-| `data`     | Mock Data 수정 | `data: 레시피 목데이터 추가`         |
-
-### 좋은 예시
+### Commit Message
 
 ```text
-feat: 레시피 카테고리 필터 구현
-feat: 식재료 추가 모달 구현
-fix: 새로고침 시 찜 목록 초기화 오류 수정
-style: 레시피 상세 페이지 레이아웃 수정
-refactor: 재료 일치율 계산 함수 분리
-data: 한식 레시피 목데이터 10개 추가
+type: 변경 내용
 ```
 
-### 피해야 할 예시
+사용 가능한 type은 `feat`, `fix`, `style`, `refactor`, `chore`, `docs`, `data`입니다. 제목은 변경 결과가 드러나는 한글 문장으로 작성합니다.
 
-```text
-수정
-작업함
-aaa
-최종
-최종진짜
-수정2
-```
+### Pull Request
 
----
+- 제목은 `[TYPE] 변경 내용` 형식을 사용합니다.
+- 작업 내용, 확인 사항, 관련 이슈를 작성합니다.
+- UI 변경은 확인 가능한 화면을 첨부합니다.
+- 가능하면 작성자 외 팀원 한 명이 확인한 뒤 병합합니다.
 
-## 4. Pull Request 규칙
+## 3. 파일과 이름
 
-기능 작업 완료 후 GitHub에 Push한 뒤 Pull Request를 생성한다.
+| 대상            | 규칙                       | 예시                    |
+| --------------- | -------------------------- | ----------------------- |
+| React 컴포넌트  | PascalCase                 | `RecipeCard.jsx`        |
+| 일반 JavaScript | camelCase                  | `storageUtils.js`       |
+| CSS Module      | 컴포넌트명 + `.module.css` | `RecipeCard.module.css` |
+| Mock Data       | camelCase `.js`            | `recipes.js`            |
 
-```bash
-git add .
-git commit -m "feat: 냉장고 식재료 추가 기능 구현"
-git push origin feature/fridge
-```
+- 변수와 함수는 `camelCase`를 사용합니다.
+- Boolean은 `is`, `has`, `can`, `should`로 시작합니다.
+- 배열은 복수형 이름을 사용합니다.
+- 이벤트 처리 함수는 `handle + 행동`, Props는 `on + 행동`으로 작성합니다.
 
-### PR 제목
+## 4. Component와 State
 
-```text
-[FEAT] 냉장고 식재료 관리 기능 구현
-```
-
-### PR 본문 예시
-
-```md
-## 작업 내용
-
-- 식재료 추가 기능 구현
-- 식재료 삭제 기능 구현
-- 수량 증가/감소 기능 구현
-- localStorage 저장 적용
-
-## 확인 사항
-
-- 새로고침 후에도 식재료 유지
-- 최소 수량 1 미만으로 내려가지 않도록 처리
-
-## 관련 화면
-
-- /fridge
-```
-
-### Merge 규칙
-
-- 가능하면 본인이 바로 Merge하지 않고 팀원 1명 이상 확인 후 Merge한다.
-- 충돌이 발생하면 작성자가 직접 해결한다.
-- Merge 후 사용이 끝난 feature 브랜치는 삭제한다.
-
----
-
-## 5. 폴더 구조
-
-```text
-src/
-├── assets/
-│   └── images/
-├── components/
-│   ├── common/
-│   │   ├── Header.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Button.jsx
-│   │   └── Modal.jsx
-│   └── recipe/
-│       ├── RecipeCard.jsx
-│       └── RecipeFilter.jsx
-├── pages/
-│   ├── HomePage.jsx
-│   ├── RecipeListPage.jsx
-│   ├── RecipeDetailPage.jsx
-│   ├── FridgePage.jsx
-│   ├── RecommendPage.jsx
-│   └── FavoritesPage.jsx
-├── data/
-│   ├── recipes.json
-│   └── ingredients.json
-├── contexts/
-│   ├── FridgeContext.jsx
-│   └── FavoriteContext.jsx
-├── hooks/
-├── utils/
-│   └── recommendation.js
-├── App.jsx
-├── main.jsx
-└── index.css
-```
-
-### 폴더 역할
-
-| 폴더         | 역할                          |
-| ------------ | ----------------------------- |
-| `components` | 재사용 가능한 UI 컴포넌트     |
-| `pages`      | Router에 직접 연결되는 페이지 |
-| `data`       | JSON Mock Data                |
-| `contexts`   | 전역 상태 관리                |
-| `hooks`      | 재사용할 Custom Hook          |
-| `utils`      | 계산/정렬/추천 등 순수 함수   |
-| `assets`     | 이미지 및 정적 파일           |
-
----
-
-## 6. 파일 및 폴더 이름 규칙
-
-### React Component
-
-PascalCase를 사용한다.
-
-```text
-RecipeCard.jsx
-RecipeDetailPage.jsx
-FridgeContext.jsx
-```
-
-### 일반 JavaScript 파일
-
-camelCase를 사용한다.
-
-```text
-recommendation.js
-recipeUtils.js
-storageUtils.js
-```
-
-### JSON
-
-```text
-recipes.json
-ingredients.json
-```
-
-### CSS
-
-```text
-RecipeCard.css
-HomePage.css
-```
-
----
-
-## 7. Component 작성 규칙
-
-### 함수형 컴포넌트 사용
-
-```jsx
-function RecipeCard({ recipe }) {
-  return (
-    <article>
-      <h3>{recipe.name}</h3>
-    </article>
-  );
-}
-
-export default RecipeCard;
-```
-
-### Props는 구조분해할당 사용
-
-권장:
+- 함수형 컴포넌트를 사용합니다.
+- Props는 매개변수에서 구조분해할당합니다.
+- 기존 값으로 계산할 수 있는 값은 별도 State로 만들지 않습니다.
+- 특정 화면에서만 쓰는 검색어, 필터, Modal 상태는 지역 State로 관리합니다.
+- 냉장고, 찜 목록처럼 여러 화면이 공유하는 상태만 Context API를 사용합니다.
 
 ```jsx
 function RecipeCard({ recipe, onFavorite }) {
+  return (
+    <article>
+      <h3>{recipe.name}</h3>
+      <button type="button" onClick={() => onFavorite(recipe.id)}>
+        찜하기
+      </button>
+    </article>
+  );
+}
 ```
 
-### 이벤트 함수명
+## 5. Router
 
-`handle + 행동` 형태를 사용한다.
+- 경로 문자열은 `src/constants/routes.js`에서 관리합니다.
+- 페이지 이동은 `<a>` 대신 `Link`, `NavLink`, `useNavigate`를 사용합니다.
+- 라우트 화면은 `src/pages`에 두고 `Page` 접미사를 사용합니다.
 
-```jsx
-const handleSearchChange = () => {};
-const handleFavoriteClick = () => {};
-const handleIngredientDelete = () => {};
-```
+현재 라우트 목록은 [README](./README.md#라우트)를 기준으로 합니다.
 
-Props로 이벤트 함수를 전달할 때는 `on + 행동`을 사용한다.
+## 6. Mock Data
 
-```jsx
-<RecipeCard onFavorite={handleFavoriteClick} />
-```
-
----
-
-## 8. 변수 / 함수 이름 규칙
-
-- 변수와 함수는 `camelCase`
-- 컴포넌트는 `PascalCase`
-- Boolean은 `is`, `has`, `can`, `should` 사용
-- 배열은 가능하면 복수형 사용
+Mock Data는 `src/data/*.js`에 배열 또는 객체로 export합니다. 필드 이름과 타입을 팀 전체에서 통일합니다.
 
 ```js
-const searchKeyword = '';
-const selectedCategory = '전체';
-const favoriteRecipes = [];
-const fridgeIngredients = [];
-const isFavorite = true;
-const isModalOpen = false;
+export const recipes = [
+  {
+    id: 1,
+    name: '김치볶음밥',
+    category: '한식',
+    difficulty: '쉬움',
+    cookingTime: 15,
+    servings: 1,
+    rating: 4.9,
+    ingredients: [{ name: '김치', amount: '100g' }],
+    steps: ['김치를 먹기 좋은 크기로 자른다.'],
+  },
+];
 ```
 
-피해야 할 이름:
+- `id`는 중복되지 않는 숫자를 사용합니다.
+- `cookingTime`은 분 단위 숫자입니다.
+- `ingredients`는 `{ name, amount }` 객체 배열입니다.
+- 필드를 추가하거나 타입을 변경하면 관련 문서와 사용처를 함께 갱신합니다.
 
-```js
-const a = [];
-const temp = [];
-const data2 = [];
-```
+## 7. localStorage
 
----
+- Key는 `src/constants/storageKeys.js`에서 관리합니다.
+- `recipick.` prefix를 사용합니다.
+- 읽기/쓰기 로직은 `src/hooks/useLocalStorage.js`를 재사용합니다.
+- 저장 실패 시 화면 전체가 중단되지 않도록 예외를 처리합니다.
 
-## 9. State 규칙
+## 8. CSS와 UI
 
-State 이름과 setter를 일치시킨다.
+- 전역 디자인 토큰, reset, 기본 요소 스타일만 `src/styles/global.css`에 둡니다.
+- 컴포넌트와 페이지 스타일은 CSS Modules를 사용합니다.
+- inline style은 동적으로 계산되는 값에만 사용합니다.
+- 반복되는 Button, Card, Input은 공통 컴포넌트로 분리합니다.
+- 색상, 간격, 글자 크기는 기존 디자인 토큰을 우선 사용합니다.
 
 ```jsx
-const [searchKeyword, setSearchKeyword] = useState('');
-const [selectedCategory, setSelectedCategory] = useState('전체');
-const [isModalOpen, setIsModalOpen] = useState(false);
-```
+import styles from './RecipeCard.module.css';
 
-기존 상태로 계산 가능한 값은 불필요하게 별도 State로 만들지 않는다.
-
-```jsx
-const filteredRecipes = recipes.filter(...);
-```
-
----
-
-## 10. React Router 규칙
-
-```text
-/                  홈
-/recipes           레시피 탐색
-/recipes/:id       레시피 상세
-/fridge            내 냉장고
-/recommend         맞춤 추천
-/favorites         찜한 레시피
-```
-
-페이지 이동은 `<a>` 대신 `Link` 또는 `useNavigate()`를 사용한다.
-
-```jsx
-<Link to="/recipes">레시피 탐색</Link>
-```
-
----
-
-## 11. Mock Data 규칙
-
-### recipes.json 기본 구조
-
-```json
-{
-  "id": 1,
-  "name": "김치볶음밥",
-  "category": "한식",
-  "difficulty": "쉬움",
-  "cookingTime": 15,
-  "servings": 1,
-  "rating": 4.9,
-  "reviewCount": 1420,
-  "image": "/images/kimchi-rice.jpg",
-  "ingredients": [
-    {
-      "name": "김치",
-      "amount": "100g"
-    },
-    {
-      "name": "밥",
-      "amount": "1공기"
-    }
-  ],
-  "steps": ["김치를 먹기 좋은 크기로 자른다.", "팬에 김치를 볶는다.", "밥을 넣고 함께 볶는다."]
+function RecipeCard() {
+  return <article className={styles.card}>레시피</article>;
 }
 ```
 
-### 규칙
+## 9. Import 순서
 
-- `id`는 중복되지 않는 숫자를 사용한다.
-- 같은 의미의 필드는 동일한 이름을 사용한다.
-- `cookingTime`은 숫자(분 단위)로 통일한다.
-- `rating`은 숫자로 저장한다.
-- `ingredients`는 객체 배열로 통일한다.
-- 새로운 필드를 추가하거나 구조를 변경할 때 팀원에게 공유한다.
+빈 줄로 다음 그룹을 구분합니다.
 
----
+1. React 및 외부 라이브러리
+2. 내부 컴포넌트
+3. constants, data, hooks, utils
+4. assets
+5. CSS
 
-## 12. localStorage Key 규칙
+사용하지 않는 import와 불필요한 `console.log`는 제거합니다.
 
-Key 충돌을 방지하기 위해 prefix를 통일한다.
+## 10. 코드 포맷
 
-```text
-fridgeChef.ingredients
-fridgeChef.favorites
-fridgeChef.recentRecipes
+- 들여쓰기 2 spaces
+- 작은따옴표와 세미콜론 사용
+- ESLint와 Prettier 결과를 기준으로 통일
+
+Push 전 다음 명령을 모두 통과해야 합니다.
+
+```bash
+pnpm format:check
+pnpm lint
+pnpm build
 ```
 
-예:
+## 11. 작업 완료 기준
 
-```js
-localStorage.setItem('fridgeChef.favorites', JSON.stringify(favorites));
-```
-
-가능하면 Key 문자열은 상수로 관리한다.
-
----
-
-## 13. Context API 규칙
-
-여러 페이지에서 공통으로 필요한 상태만 Context로 관리한다.
-
-### Context 사용 대상
-
-- 냉장고 보유 식재료
-- 찜한 레시피
-
-### Context로 만들 필요 없는 데이터
-
-- 특정 페이지의 검색어
-- 특정 페이지에서만 사용하는 Modal 상태
-- 페이지 내부의 선택된 필터
-
----
-
-## 14. 추천 로직 규칙
-
-추천/계산 로직은 컴포넌트 내부에 길게 작성하지 않고 `utils`로 분리한다.
-
-```js
-export function calculateMatchRate(recipe, fridgeIngredients) {
-  // 일치율 계산
-}
-
-export function getMissingIngredients(recipe, fridgeIngredients) {
-  // 부족 재료 반환
-}
-```
-
-예:
-
-```text
-내 냉장고: 김치 / 밥 / 계란 / 대파
-필요 재료: 김치 / 밥 / 계란 / 대파 / 참기름
-
-일치율 = 4 / 5 × 100 = 80%
-```
-
----
-
-## 15. CSS / UI 규칙
-
-- Stitch/Figma 디자인 시스템을 기준으로 구현한다.
-- 페이지마다 임의의 색상을 새로 추가하지 않는다.
-- 공통 Button, Card, Input 스타일은 재사용한다.
-- 동일한 역할의 요소는 동일한 `border-radius`, `padding`, `font-size`를 사용한다.
-- 가능한 한 inline style은 사용하지 않는다.
-- 반복되는 UI는 컴포넌트로 분리한다.
-
-클래스명 예시:
-
-```css
-.recipe-card {
-}
-.recipe-card__image {
-}
-.recipe-card__title {
-}
-.recipe-card__meta {
-}
-.recipe-card__favorite-button {
-}
-```
-
----
-
-## 16. Import 규칙
-
-다음 순서로 정리한다.
-
-```jsx
-// 1. React / 외부 라이브러리
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-
-// 2. 내부 Component
-import RecipeCard from '../components/recipe/RecipeCard';
-
-// 3. Data / Utils
-import recipes from '../data/recipes.json';
-import { calculateMatchRate } from '../utils/recommendation';
-
-// 4. CSS
-import './RecipeListPage.css';
-```
-
-사용하지 않는 import는 제거한다.
-
----
-
-## 17. 코드 포맷
-
-- 들여쓰기: 2 spaces
-- 문자열 따옴표 스타일은 프로젝트 전체에서 통일
-- 세미콜론 사용 여부도 프로젝트 전체에서 통일
-- 불필요한 `console.log()`는 Merge 전에 제거
-- 가능하면 ESLint + Prettier를 팀 전체가 동일하게 사용
-
----
-
-## 18. 주석 규칙
-
-코드 자체로 이해 가능한 부분에는 불필요한 주석을 작성하지 않는다.
-
-좋은 예:
-
-```js
-// 보유 재료와 필요 재료를 비교해 레시피 일치율 계산
-const matchRate = calculateMatchRate(recipe, fridgeIngredients);
-```
-
-피해야 할 예:
-
-```js
-// 변수 선언
-const recipes = [];
-```
-
----
-
-## 19. 담당 영역
-
-| 담당 | 주요 영역                                   |
-| ---- | ------------------------------------------- |
-| 1    | 홈 / 레시피 탐색 / 검색 / 필터 / 정렬       |
-| 2    | 내 냉장고 / 식재료 추가·삭제 / localStorage |
-| 3    | 맞춤 추천 / 일치율 / 부족 재료 / 랜덤 추천  |
-| 4    | 레시피 상세 / Router / 찜 / 찜 목록         |
-
-담당 영역 밖의 공통 코드를 수정할 경우 관련 담당자에게 공유한다.
-
----
-
-## 20. 작업 완료 기준
-
-- 기능이 정상 동작한다.
-- 필요한 데이터는 새로고침 후에도 유지된다.
-- 다른 페이지의 기능을 깨뜨리지 않는다.
-- Mock Data 필드 구조를 준수한다.
-- 불필요한 console/error가 없다.
-- 페이지 이동이 정상 동작한다.
-- 빈 데이터 / 검색 결과 없음 상태를 처리한다.
-- Push 전에 `pnpm dev`로 직접 확인한다.
-
----
-
-## 21. 개발 시작 전 체크리스트
-
-- [ ] GitHub Repository Clone
-- [ ] `pnpm install`
-- [ ] `pnpm dev` 실행 확인
-- [ ] 본인 feature branch 생성
-- [ ] React Router 경로 확인
-- [ ] Mock Data 구조 확인
-- [ ] 공통 Component 확인
-- [ ] Stitch/Figma 담당 화면 확인
-
----
-
-## 22. 작업 종료 전 체크리스트
-
-- [ ] 변경된 파일 확인
-- [ ] 불필요한 코드 및 `console.log()` 삭제
-- [ ] 화면 직접 테스트
-- [ ] 다른 Route 정상 동작 확인
-- [ ] `git add .`
-- [ ] Convention에 맞는 Commit 작성
-- [ ] Push
-- [ ] Pull Request 생성
-- [ ] PR 내용 작성
+- Issue의 완료 조건을 충족합니다.
+- 관련 라우트와 빈 데이터 상태를 직접 확인합니다.
+- 새로고침 후 유지가 필요한 값은 정상 복원됩니다.
+- 다른 화면과 공통 레이아웃이 깨지지 않습니다.
+- Mock Data 및 localStorage 스키마를 준수합니다.
+- 문서와 실제 코드가 함께 갱신됩니다.
+- PR 본문에 검증 결과와 `Close #이슈번호`를 남깁니다.

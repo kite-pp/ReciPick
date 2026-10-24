@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="title description">
+  <title id="title">레시피 이미지 준비 중</title>
+  <desc id="description">주황색 접시와 수저가 있는 레시피 플레이스홀더</desc>
+  <rect width="640" height="400" fill="#fff7ed" />
+  <circle cx="320" cy="200" r="112" fill="#ffffff" stroke="#f97316" stroke-width="18" />
+  <circle cx="320" cy="200" r="62" fill="#fed7aa" />
+  <rect x="126" y="105" width="16" height="190" rx="8" fill="#9a3412" />
+  <rect x="498" y="105" width="16" height="190" rx="8" fill="#9a3412" />
+</svg>

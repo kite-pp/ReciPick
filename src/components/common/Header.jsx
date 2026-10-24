@@ -5,14 +5,8 @@ import bellIcon from '../../assets/common/bell.svg';
 import brandLogo from '../../assets/common/brand-logo.png';
 import profileAvatar from '../../assets/common/profile-avatar.png';
 import searchIcon from '../../assets/common/search.svg';
-import './common-layout.css';
-
-const navigationItems = [
-  { to: '/recommend', label: '식재료 추천' },
-  { to: '/fridge', label: '내 냉장고 관리' },
-  { to: '/recipes', label: '레시피 탐색' },
-  { to: '/favorites', label: '찜한 레시피' },
-];
+import { PRIMARY_NAVIGATION_ITEMS, ROUTES } from '../../constants/routes.js';
+import styles from './Layout.module.css';
 
 function Header() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,21 +17,21 @@ function Header() {
 
     const query = searchTerm.trim();
     const search = query ? `?search=${encodeURIComponent(query)}` : '';
-    navigate(`/recipes${search}`);
+    navigate(`${ROUTES.recipes}${search}`);
   };
 
   return (
     <>
-      <header className="site-header">
-        <div className="site-header__inner">
-          <div className="site-header__start">
-            <Link className="brand" to="/" aria-label="ReciPick 홈">
-              <img className="brand__logo" src={brandLogo} alt="" />
-              <span className="brand__name">ReciPick</span>
+      <header className={styles['site-header']}>
+        <div className={styles['site-header__inner']}>
+          <div className={styles['site-header__start']}>
+            <Link className={styles.brand} to={ROUTES.home} aria-label="ReciPick 홈">
+              <img className={styles['brand__logo']} src={brandLogo} alt="" />
+              <span className={styles['brand__name']}>ReciPick</span>
             </Link>
 
-            <form className="header-search" role="search" onSubmit={handleSearch}>
-              <label className="sr-only" htmlFor="recipe-search">
+            <form className={styles['header-search']} role="search" onSubmit={handleSearch}>
+              <label className={styles['sr-only']} htmlFor="recipe-search">
                 레시피 검색
               </label>
               <input
@@ -53,13 +47,15 @@ function Header() {
             </form>
           </div>
 
-          <nav className="primary-nav" aria-label="주요 메뉴">
-            {navigationItems.map((item) => (
+          <nav className={styles['primary-nav']} aria-label="주요 메뉴">
+            {PRIMARY_NAVIGATION_ITEMS.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `primary-nav__link${isActive ? ' primary-nav__link--active' : ''}`
+                  [styles['primary-nav__link'], isActive ? styles['primary-nav__link--active'] : '']
+                    .filter(Boolean)
+                    .join(' ')
                 }
               >
                 {item.label}
@@ -67,29 +63,31 @@ function Header() {
             ))}
           </nav>
 
-          <div className="site-header__actions">
-            <button className="notification-button" type="button" aria-label="알림 확인">
+          <div className={styles['site-header__actions']}>
+            <button className={styles['notification-button']} type="button" aria-label="알림 확인">
               <img src={bellIcon} alt="" />
-              <span className="notification-button__dot" aria-hidden="true" />
+              <span className={styles['notification-button__dot']} aria-hidden="true" />
             </button>
-            <div className="profile" aria-label="사용자 프로필">
-              <img className="profile__avatar" src={profileAvatar} alt="" />
-              <div className="profile__copy">
+            <Link className={styles.profile} to={ROUTES.myPage} aria-label="마이페이지">
+              <img className={styles['profile__avatar']} src={profileAvatar} alt="" />
+              <div className={styles['profile__copy']}>
                 <strong>ReciPick 셰프</strong>
                 <span>오늘도 맛있는 한 끼</span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </header>
 
-      <nav className="mobile-nav" aria-label="모바일 주요 메뉴">
-        {navigationItems.map((item) => (
+      <nav className={styles['mobile-nav']} aria-label="모바일 주요 메뉴">
+        {PRIMARY_NAVIGATION_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `mobile-nav__link${isActive ? ' mobile-nav__link--active' : ''}`
+              [styles['mobile-nav__link'], isActive ? styles['mobile-nav__link--active'] : '']
+                .filter(Boolean)
+                .join(' ')
             }
           >
             {item.label}

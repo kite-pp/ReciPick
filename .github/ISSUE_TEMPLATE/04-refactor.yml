@@ -1,6 +1,8 @@
 name: '♻️ 리팩터링'
 description: '기능 변화 없이 구조와 유지보수성을 개선합니다.'
 title: '[REFACTOR] '
+labels:
+  - refactor
 body:
   - type: textarea
     id: problem

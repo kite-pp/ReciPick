@@ -6,7 +6,6 @@ import App from './App.jsx';
 import './styles/global.css';
 import { UserDataProvider } from './contexts/UserDataContext.jsx';
 
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>

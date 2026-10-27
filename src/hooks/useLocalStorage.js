@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 function readStoredValue(key, initialValue) {
   const fallbackValue = typeof initialValue === 'function' ? initialValue() : initialValue;
@@ -14,19 +14,22 @@ function readStoredValue(key, initialValue) {
 export function useLocalStorage(key, initialValue) {
   const [value, setValue] = useState(() => readStoredValue(key, initialValue));
 
-  const setStoredValue = (nextValue) => {
-    setValue((currentValue) => {
-      const resolvedValue = typeof nextValue === 'function' ? nextValue(currentValue) : nextValue;
+  const setStoredValue = useCallback(
+    (nextValue) => {
+      setValue((currentValue) => {
+        const resolvedValue = typeof nextValue === 'function' ? nextValue(currentValue) : nextValue;
 
-      try {
-        window.localStorage.setItem(key, JSON.stringify(resolvedValue));
-      } catch {
-        return currentValue;
-      }
+        try {
+          window.localStorage.setItem(key, JSON.stringify(resolvedValue));
+        } catch {
+          return currentValue;
+        }
 
-      return resolvedValue;
-    });
-  };
+        return resolvedValue;
+      });
+    },
+    [key],
+  );
 
   return [value, setStoredValue];
 }

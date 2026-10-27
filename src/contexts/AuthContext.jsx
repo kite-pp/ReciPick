@@ -1,0 +1,96 @@
+import { useCallback, useMemo, useState } from 'react';
+
+import { AuthContext } from './useAuth.js';
+
+// S1 화면 개발용 임시 인증입니다. 실제 계정 검증과 데이터 접근 제어는 Supabase Auth/RLS가 맡습니다.
+const MOCK_USER_KEY = 'recipick.mockAuth.user';
+
+function readMockUser() {
+  try {
+    const value = window.sessionStorage.getItem(MOCK_USER_KEY);
+    if (!value) return null;
+
+    const user = JSON.parse(value);
+    return typeof user?.id === 'string' && typeof user?.email === 'string' ? user : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveMockUser(user) {
+  try {
+    window.sessionStorage.setItem(MOCK_USER_KEY, JSON.stringify(user));
+  } catch {
+    throw new Error('임시 로그인 정보를 저장할 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.');
+  }
+}
+
+function createMockUser(credentials) {
+  const email =
+    typeof credentials?.email === 'string' ? credentials.email.trim().toLowerCase() : '';
+  if (!email) throw new Error('이메일을 입력해 주세요.');
+
+  return {
+    id: `mock:${email}`,
+    email,
+    user_metadata: {},
+  };
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(readMockUser);
+
+  const login = useCallback(async (credentials) => {
+    // 비밀번호를 검사하거나 저장하지 않습니다. #38에서 실제 Supabase Auth로 교체합니다.
+    const nextUser = createMockUser(credentials);
+    saveMockUser(nextUser);
+    setUser(nextUser);
+    return nextUser;
+  }, []);
+
+  const signUp = useCallback(async (credentials) => {
+    // 실제 계정은 생성되지 않습니다. 화면 흐름만 확인하는 임시 함수입니다.
+    const nextUser = createMockUser(credentials);
+    saveMockUser(nextUser);
+    setUser(nextUser);
+    return nextUser;
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      window.sessionStorage.removeItem(MOCK_USER_KEY);
+    } finally {
+      setUser(null);
+    }
+  }, []);
+
+  const updateProfile = useCallback(
+    async (profile) => {
+      if (!user) throw new Error('로그인이 필요합니다.');
+      if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
+        throw new Error('수정할 프로필 정보를 확인해 주세요.');
+      }
+
+      const nextUser = { ...user, user_metadata: { ...user.user_metadata, ...profile } };
+      saveMockUser(nextUser);
+      setUser(nextUser);
+      return nextUser;
+    },
+    [user],
+  );
+
+  const value = useMemo(
+    () => ({
+      user,
+      isLoggedIn: Boolean(user),
+      isLoading: false,
+      signUp,
+      login,
+      logout,
+      updateProfile,
+    }),
+    [user, signUp, login, logout, updateProfile],
+  );
+
+  return <AuthContext value={value}>{children}</AuthContext>;
+}

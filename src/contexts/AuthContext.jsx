@@ -20,9 +20,23 @@ function readMockUser() {
 function saveMockUser(user) {
   try {
     window.sessionStorage.setItem(MOCK_USER_KEY, JSON.stringify(user));
+    return true;
   } catch {
-    throw new Error('임시 로그인 정보를 저장할 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.');
+    return false;
   }
+}
+
+function replaceMockUser(user, hasStoredSession) {
+  if (saveMockUser(user)) return true;
+  if (!hasStoredSession) return false;
+
+  try {
+    window.sessionStorage.removeItem(MOCK_USER_KEY);
+  } catch {
+    throw new Error('이전 임시 로그인 정보를 지울 수 없어 계정을 전환할 수 없습니다.');
+  }
+
+  return false;
 }
 
 function createMockUser(credentials) {
@@ -39,30 +53,49 @@ function createMockUser(credentials) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(readMockUser);
+  const [hasStoredSession, setHasStoredSession] = useState(Boolean(user));
+  const [storageWarning, setStorageWarning] = useState(false);
 
-  const login = useCallback(async (credentials) => {
-    // 비밀번호를 검사하거나 저장하지 않습니다. #38에서 실제 Supabase Auth로 교체합니다.
-    const nextUser = createMockUser(credentials);
-    saveMockUser(nextUser);
-    setUser(nextUser);
-    return nextUser;
-  }, []);
+  const login = useCallback(
+    async (credentials) => {
+      // 비밀번호를 검사하거나 저장하지 않습니다. #38에서 실제 Supabase Auth로 교체합니다.
+      const nextUser = createMockUser(credentials);
+      const isSaved = replaceMockUser(nextUser, hasStoredSession);
+      setHasStoredSession(isSaved);
+      setStorageWarning(!isSaved);
+      setUser(nextUser);
+      return nextUser;
+    },
+    [hasStoredSession],
+  );
 
-  const signUp = useCallback(async (credentials) => {
-    // 실제 계정은 생성되지 않습니다. 화면 흐름만 확인하는 임시 함수입니다.
-    const nextUser = createMockUser(credentials);
-    saveMockUser(nextUser);
-    setUser(nextUser);
-    return nextUser;
-  }, []);
+  const signUp = useCallback(
+    async (credentials) => {
+      // 실제 계정은 생성되지 않습니다. 화면 흐름만 확인하는 임시 함수입니다.
+      const nextUser = createMockUser(credentials);
+      const isSaved = replaceMockUser(nextUser, hasStoredSession);
+      setHasStoredSession(isSaved);
+      setStorageWarning(!isSaved);
+      setUser(nextUser);
+      return nextUser;
+    },
+    [hasStoredSession],
+  );
 
   const logout = useCallback(async () => {
     try {
       window.sessionStorage.removeItem(MOCK_USER_KEY);
-    } finally {
-      setUser(null);
+    } catch {
+      if (hasStoredSession) {
+        throw new Error(
+          '임시 로그인 정보를 지울 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.',
+        );
+      }
     }
-  }, []);
+    setUser(null);
+    setHasStoredSession(false);
+    setStorageWarning(false);
+  }, [hasStoredSession]);
 
   const updateProfile = useCallback(
     async (profile) => {
@@ -72,11 +105,16 @@ export function AuthProvider({ children }) {
       }
 
       const nextUser = { ...user, user_metadata: { ...user.user_metadata, ...profile } };
-      saveMockUser(nextUser);
+      const isSaved = saveMockUser(nextUser);
+      if (!isSaved && hasStoredSession) {
+        throw new Error('프로필 정보를 저장할 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.');
+      }
+      setHasStoredSession(isSaved);
+      setStorageWarning(!isSaved);
       setUser(nextUser);
       return nextUser;
     },
-    [user],
+    [user, hasStoredSession],
   );
 
   const value = useMemo(
@@ -92,5 +130,15 @@ export function AuthProvider({ children }) {
     [user, signUp, login, logout, updateProfile],
   );
 
-  return <AuthContext value={value}>{children}</AuthContext>;
+  return (
+    <AuthContext value={value}>
+      {user && storageWarning && (
+        <p role="alert">
+          브라우저 저장소에 접근할 수 없어 현재 로그인은 메모리에만 보관됩니다. 새로고침하면 이
+          로그인 상태가 유지되지 않을 수 있습니다.
+        </p>
+      )}
+      {children}
+    </AuthContext>
+  );
 }

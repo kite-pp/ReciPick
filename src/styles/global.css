@@ -1,9 +1,36 @@
 :root {
-  --color-primary: #ff5a36;
-  --color-primary-soft: #ffe6de;
-  --color-text: #1f1b19;
-  --color-muted: #5b403a;
-  --color-background: #fff8f5;
+  /* 색상 - 검정 기반 (10/24 확정) */
+  /* TODO: 피그마 값 나오면 다시 맞추기 */
+  --color-primary: #111111;
+  --color-primary-hover: #333333;
+  --color-primary-soft: #f1f1f1;
+  --color-text: #111111;
+  --color-muted: #6b6b6b;
+  --color-background: #fafafa;
+  --color-white: #ffffff;
+  --color-border: #e0e0e0;
+  --color-disabled: #bdbdbd;
+
+  /* 상태 색 (소비기한 배지, 에러 메시지 등) */
+  --color-danger: #e5484d;
+  --color-danger-soft: #fdecec;
+  --color-warning: #b86e00;
+  --color-warning-soft: #fff3df;
+  --color-success: #2b8a52;
+  --color-success-soft: #e6f5ec;
+
+  /* 글자 크기 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+
+  /* 모서리 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-full: 999px;
+
   --layout-max-width: 1280px;
   --layout-padding: 32px;
   --header-height: 80px;
@@ -55,7 +82,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid rgb(255 90 54 / 42%);
+  outline: 3px solid rgb(17 17 17 / 40%);
   outline-offset: 3px;
 }
 

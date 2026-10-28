@@ -1,0 +1,86 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+/* 종류 */
+.primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.primary:disabled {
+  background-color: var(--color-disabled);
+}
+
+.secondary {
+  border-color: var(--color-border);
+  background-color: var(--color-white);
+  color: var(--color-text);
+}
+
+.secondary:hover {
+  background-color: var(--color-primary-soft);
+}
+
+.secondary:disabled {
+  background-color: var(--color-white);
+  color: var(--color-disabled);
+}
+
+.text {
+  background-color: transparent;
+  color: var(--color-muted);
+}
+
+.text:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.text:disabled {
+  color: var(--color-disabled);
+  text-decoration: none;
+}
+
+/* 크기 */
+.small {
+  height: 32px;
+  padding: 0 12px;
+  font-size: var(--font-size-xs);
+}
+
+.medium {
+  height: 40px;
+  padding: 0 16px;
+  font-size: var(--font-size-sm);
+}
+
+.large {
+  height: 48px;
+  padding: 0 20px;
+  font-size: var(--font-size-md);
+}
+
+.fullWidth {
+  width: 100%;
+}

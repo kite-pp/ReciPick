@@ -291,6 +291,45 @@
   white-space: nowrap;
 }
 
+.login-link {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.login-link:hover {
+  opacity: 0.85;
+}
+
+.logout-button {
+  padding: 8px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+/* 로그인 상태 확인 중일 때 자리 잡아두기 */
+.auth-placeholder {
+  width: 120px;
+  height: 42px;
+}
+
 .mobile-nav {
   display: none;
 }

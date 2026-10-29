@@ -4,7 +4,7 @@
   justify-content: center;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700; /* Figma 반영 */
   cursor: pointer;
 }
 
@@ -24,7 +24,7 @@
 .secondary {
   border-color: var(--color-border);
   background-color: var(--color-white);
-  color: var(--color-text);
+  color: var(--color-muted);
 }
 
 .secondary:hover {
@@ -47,9 +47,10 @@
 }
 
 .medium {
-  height: 40px;
-  padding: 0 16px;
-  font-size: var(--font-size-sm);
+  /* Figma 반영 */
+  height: 44px;
+  padding: 0 20px;
+  font-size: var(--font-size-md);
 }
 
 .large {

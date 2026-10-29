@@ -1,31 +1,33 @@
 :root {
-  --color-primary: #ff5a36;
-  --color-primary-soft: #ffe6de;
-  --color-text: #1f1b19;
-  --color-muted: #5b403a;
-  --color-background: #fff8f5;
-
-  /* ↓ 여기부터 새로 추가 (TODO: 피그마 값 확인 후 수정) */
+  /* 색상 */
+  --color-primary: #121212;
+  --color-primary-soft: #f2f3f8;
+  --color-text: #121212;
+  --color-muted: #4b5068;
+  --color-background: #f2f3f8;
   --color-white: #ffffff;
-  --color-border: #e0e0e0;
-  --color-disabled: #bdbdbd;
-  --color-danger: #e5484d;
-  --color-danger-soft: #fdecec;
-  --color-warning: #b86e00;
-  --color-warning-soft: #fff3df;
-  --color-success: #2b8a52;
-  --color-success-soft: #e6f5ec;
+  --color-border: #e9ecf4;
+  --color-disabled: #9da5c1;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-warning: #b45309;
+  --color-warning-soft: #fffbeb;
+  --color-success: #059669;
+  --color-success-soft: #ecfdf5;
 
+  /* 글자 크기 */
   --font-size-xs: 12px;
   --font-size-sm: 14px;
-  --font-size-md: 16px;
+  --font-size-md: 15px;
   --font-size-lg: 18px;
   --font-size-xl: 24px;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-full: 999px;
-  /* ↑ 여기까지 */
+  /* 모서리 */
+  --radius-md: 12px; /* 버튼, 입력창 */
+  --radius-xl: 24px; /* 카드 */
+  --radius-full: 999px; /* 배지 */
+
+  /* 레이아웃 */
   --layout-max-width: 1280px;
   --layout-padding: 32px;
   --header-height: 80px;
@@ -77,7 +79,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid rgb(255 90 54 / 42%);
+  outline: 3px solid rgb(18 18 18 / 40%);
   outline-offset: 3px;
 }
 

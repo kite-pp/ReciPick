@@ -1,5 +1,10 @@
 import styles from './Button.module.css';
 
+// 사용 예시
+// <Button onClick={handleSave}>저장</Button>
+// <Button variant="secondary" size="small">취소</Button>
+// <Button type="submit" fullWidth disabled={isLoading}>로그인</Button>
+// variant: 'primary'(기본) | 'secondary' | 'text' / size: 'small' | 'medium'(기본) | 'large'
 function Button({
   children,
   variant = 'primary',

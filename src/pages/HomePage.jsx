@@ -35,14 +35,14 @@ function HomePage() {
 
   return (
     <div className={styles.home}>
-      {/* 히어로 */}
-      <section className={styles.hero}>
-        <span className={styles.heroBadge}>냉장고 기반 맞춤 레시피</span>
-        <h1 className={styles.heroTitle}>오늘 뭐 먹지?</h1>
-        <p className={styles.heroText}>
+      {/* 배너 */}
+      <section className={styles.banner}>
+        <span className={styles.bannerBadge}>냉장고 기반 맞춤 레시피</span>
+        <h1 className={styles.bannerTitle}>오늘 뭐 먹지?</h1>
+        <p className={styles.bannerText}>
           냉장고 속 재료를 등록하면 지금 만들 수 있는 레시피를 추천해드려요.
         </p>
-        <div className={styles.heroButtons}>
+        <div className={styles.bannerButtons}>
           <Link className={styles.primaryLink} to={ROUTES.fridge}>
             내 냉장고 등록하기
           </Link>

@@ -4,8 +4,8 @@
   gap: 40px;
 }
 
-/* 히어로 */
-.hero {
+/* 배너 */
+.banner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,7 +17,7 @@
   text-align: center;
 }
 
-.heroBadge {
+.bannerBadge {
   padding: 7px 14px;
   border-radius: var(--radius-full);
   background-color: var(--color-white);
@@ -25,20 +25,20 @@
   font-weight: 500;
 }
 
-.heroTitle {
+.bannerTitle {
   margin: 0;
   font-size: 52px;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.heroText {
+.bannerText {
   margin: 0;
   color: var(--color-muted);
   font-size: 17px;
 }
 
-.heroButtons {
+.bannerButtons {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -150,11 +150,11 @@
 }
 
 @media (max-width: 600px) {
-  .hero {
+  .banner {
     padding: 32px 20px;
   }
 
-  .heroTitle {
+  .bannerTitle {
     font-size: 36px;
   }
 

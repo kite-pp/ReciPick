@@ -1,58 +1,114 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import Button from '../components/common/Button.jsx';
+import Input from '../components/common/Input.jsx';
 import { ROUTES } from '../constants/routes.js';
 import { useAuth } from '../contexts/useAuth.js';
+import { getRedirectPath, validateEmail } from '../utils/authValidation.js';
+import styles from './AuthPage.module.css';
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError('');
+    if (isSubmitting) return;
 
+    // 로그인은 형식만 확인하고 비밀번호 길이 규칙은 회원가입에서만 검사합니다.
+    const nextErrors = {
+      email: validateEmail(form.email),
+      password: form.password ? '' : '비밀번호를 입력해 주세요.',
+    };
+    setErrors(nextErrors);
+    setFormError('');
+    if (nextErrors.email || nextErrors.password) return;
+
+    setIsSubmitting(true);
     try {
-      await login({ email });
-      const from = location.state?.from;
-      const destination =
-        typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
-          ? from
-          : ROUTES.home;
-      navigate(destination, { replace: true });
+      await login({ email: form.email.trim(), password: form.password });
+      navigate(getRedirectPath(location.state?.from, ROUTES.home), { replace: true });
     } catch (loginError) {
-      setError(loginError.message);
+      setFormError(loginError.message);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <section aria-labelledby="login-title">
-      <h1 id="login-title">임시 로그인</h1>
-      <p>
-        화면 개발을 위한 임시 인증입니다. 실제 계정을 확인하지 않으며 데이터를 보호하지 않습니다.
-      </p>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="mock-login-email">이메일</label>
-        <input
-          id="mock-login-email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
-        <button type="submit">임시 로그인</button>
-      </form>
-      {error && <p role="alert">{error}</p>}
-      <p>
-        처음이신가요?{' '}
-        <Link to={ROUTES.signUp} state={location.state}>
-          임시 회원가입 화면
-        </Link>
-      </p>
+    <section className={styles.page} aria-labelledby="login-title">
+      <div className={styles.card}>
+        <header className={styles.header}>
+          <h1 id="login-title" className={styles.title}>
+            로그인
+          </h1>
+          <p className={styles.subtitle}>
+            로그인하면 냉장고와 찜한 레시피를 어디서든 이어서 볼 수 있어요.
+          </p>
+        </header>
+
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <div className={styles.fields}>
+            <Input
+              id="login-email"
+              name="email"
+              type="email"
+              label="이메일"
+              placeholder="example@email.com"
+              autoComplete="email"
+              value={form.email}
+              onChange={handleChange}
+              error={errors.email}
+              disabled={isSubmitting}
+            />
+            <Input
+              id="login-password"
+              name="password"
+              type="password"
+              label="비밀번호"
+              placeholder="비밀번호를 입력하세요"
+              autoComplete="current-password"
+              value={form.password}
+              onChange={handleChange}
+              error={errors.password}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {formError && (
+            <p className={styles.formError} role="alert">
+              {formError}
+            </p>
+          )}
+
+          <Button type="submit" fullWidth disabled={isSubmitting}>
+            {isSubmitting ? '로그인 중...' : '로그인'}
+          </Button>
+        </form>
+
+        <p className={styles.switch}>
+          아직 계정이 없나요?
+          <Link to={ROUTES.signUp} state={location.state}>
+            회원가입
+          </Link>
+        </p>
+
+        {/* #38에서 Supabase Auth로 교체하면 이 안내를 제거합니다. */}
+        <p className={styles.notice}>
+          현재는 화면 확인용 임시 로그인으로, 비밀번호를 검사하지 않습니다.
+        </p>
+      </div>
     </section>
   );
 }

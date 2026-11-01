@@ -1,9 +1,8 @@
 import styles from './FridgeCard.module.css';
-import { useState } from 'react';
 import { useUserData } from '../../contexts/UserDataContext.jsx';
 import { getExpiryInfo } from '../../utils/getExpiryInfo.js'
 
-function FridgeModal({ ingredient }) {
+function FridgeModal({ ingredient, onClick }) {
     const { id, name, category, image } = ingredient;
 
     // UserDataContext 에 들어있는 localstorage 값 가져오기
@@ -22,9 +21,6 @@ function FridgeModal({ ingredient }) {
         },
     ]
     */
-
-
-
 
     const fridgeItem = fridgeIngredients.find((item) => {
         return item.ingredientId === id;
@@ -56,8 +52,9 @@ function FridgeModal({ ingredient }) {
     const expiryInfo = getExpiryInfo(fridgeItem?.expiresAt);
 
     return (
-        <article className={styles.card}>
-            <button className={styles.closeButton} onClick={() => {
+        <article className={styles.card} onClick={onClick}>
+            <button className={styles.closeButton} onClick={(event) => {
+                event.stopPropagation();
                 confirm("정말 삭제하시겠습니까?") && handleRemove();
             }}>×</button>
 
@@ -78,9 +75,15 @@ function FridgeModal({ ingredient }) {
             <span>보유 수량</span>
 
             <div className={styles.quantityControl}>
-                <button type="button" onClick={handleDecrease}>-</button>
+                <button type="button" onClick={(event) => {
+                    event.stopPropagation();
+                    handleDecrease();
+                }}>-</button>
                 <strong>{fridgeItem?.quantity ?? 0}개</strong>
-                <button type="button" onClick={handleIncrease}>+</button>
+                <button type="button" onClick={(event) => {
+                    event.stopPropagation();
+                    handleIncrease();
+                }}>+</button>
             </div>
             </div>
         </article>

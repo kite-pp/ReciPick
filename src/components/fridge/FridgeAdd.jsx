@@ -1,31 +1,43 @@
 import styles from './FridgeAdd.module.css';
 import { ingredients } from "../../data/ingredients.js";
-import { RECIPE_CATEGORIES, DIFFICULTIES, INGREDIENT_CATEGORIES, COOKING_TIME_FILTERS, INGREDIENT_UNITS } from "../../data/constants.js";
+import { INGREDIENT_UNITS } from "../../data/constants.js";
 import { useState } from "react";
 import { useUserData } from '../../contexts/UserDataContext.jsx';
 
 
-function FridgeAdd({ setIsAddModalOpen }) {
+function FridgeAdd({ mode, ingredient, onClose }) {
+    const { fridgeIngredients, addFridgeIngredient, updateFridgeIngredient } = useUserData();
+    const fridgeItem = fridgeIngredients.find((item) => item.ingredientId === ingredient?.id);
+    const isEditMode = mode === "edit";
 
     const [searchText, setSearchText] = useState('');
-    const [selectIngredient, setSelectIngredient] = useState(null);
-    const [isClick, setIsClick] = useState(true);
-    const [quantity, setQuantity] = useState(1);
-    const [unit, setUnit] = useState('개');
-    const [expiresAt, setExpiresAt] = useState('');
+    const [selectIngredient, setSelectIngredient] = useState(ingredient ?? null);
+    const [isClick, setIsClick] = useState(!isEditMode);
+    const [quantity, setQuantity] = useState(fridgeItem?.quantity ?? 1);
+    const [unit, setUnit] = useState(fridgeItem?.unit ?? '개');
+    const [expiresAt, setExpiresAt] = useState(fridgeItem?.expiresAt ?? '');
 
-    console.log(selectIngredient)
+    const saveSubmit = async (event) => {
+        event.preventDefault();
 
-    const { addFridgeIngredient } = useUserData();
+        if (isEditMode) {
+            await updateFridgeIngredient(ingredient.id, {
+                quantity,
+                unit,
+                expiresAt: expiresAt || null,
+            });
+        } else {
+            if (!selectIngredient) return;
 
-    const saveSubmit = () => {
+            await addFridgeIngredient({
+                ingredientId: selectIngredient.id,
+                quantity,
+                unit,
+                expiresAt: expiresAt || null,
+            });
+        }
 
-        addFridgeIngredient({
-        ingredientId: selectIngredient.id,
-        quantity,
-        unit,
-        expiresAt: expiresAt || null,
-        });
+        onClose();
     }
 
 
@@ -33,10 +45,11 @@ function FridgeAdd({ setIsAddModalOpen }) {
         <form className={styles.form} onSubmit={saveSubmit}>
             <div className={styles.heading}>
                 <span>SMART FRIDGE</span>
-                <h2>새 식재료 추가</h2>
+                <h2>{isEditMode ? '식재료 정보 수정' : '새 식재료 추가'}</h2>
                 <p>
-                    재료를 검색해 선택하고 수량과 소비기한을 입력하면 소비기한 알림과
-                    맞춤 추천에 활용돼요.
+                    {isEditMode
+                        ? '보관 중인 식재료의 수량과 소비기한을 수정할 수 있어요.'
+                        : '재료를 검색해 선택하고 수량과 소비기한을 입력하면 소비기한 알림과 맞춤 추천에 활용돼요.'}
                 </p>
             </div>
 
@@ -46,12 +59,14 @@ function FridgeAdd({ setIsAddModalOpen }) {
                 <input
                     id="ingredient-search"
                     type="search"
-                    placeholder={isClick? "재료 이름으로 검색" : selectIngredient?.name ?? ''}
+                    placeholder={isEditMode ? selectIngredient?.name : (isClick ? "재료 이름으로 검색" : selectIngredient?.name ?? '')}
+                    value={isEditMode ? selectIngredient?.name ?? '' : undefined}
+                    readOnly={isEditMode}
                     onChange={(e) => {
                         setSearchText(e.target.value)
                     }}
                 />
-                {isClick ? <>
+                {!isEditMode && isClick ? <>
                 <div className={styles.searchResults}>
                     {ingredients
                         .filter((ingredient) =>
@@ -100,7 +115,7 @@ function FridgeAdd({ setIsAddModalOpen }) {
                     id="ingredient-quantity"
                     type="number"
                     min="0"
-                    defaultValue="1"
+                value={quantity}
                     onChange={(event) => {
                         setQuantity(Number(event.target.value));
                     }}
@@ -110,7 +125,7 @@ function FridgeAdd({ setIsAddModalOpen }) {
             <div className={styles.field}>
                 <label htmlFor="ingredient-unit">단위</label>
 
-                <select id="ingredient-unit" defaultValue="개" onChange={(e) => setUnit(e.target.value)}>
+                <select id="ingredient-unit" value={unit} onChange={(e) => setUnit(e.target.value)}>
                     {INGREDIENT_UNITS.map((i) => 
                     <option value={i} key={i}>{i}</option>
                     )}
@@ -123,13 +138,14 @@ function FridgeAdd({ setIsAddModalOpen }) {
                 <input
                     id="ingredient-expires-at"
                     type="date"
+                    value={expiresAt}
                     onChange={(e) => setExpiresAt(e.target.value)}
                 />
             </div>
 
             <div className={styles.actions}>
-                <button type="button" onClick={() => setIsAddModalOpen(false)}>취소</button>
-                <button type="submit">식재료 저장</button>
+                <button type="button" onClick={onClose}>취소</button>
+                <button type="submit">{isEditMode ? '변경사항 저장' : '식재료 저장'}</button>
             </div>
         </form>
     );

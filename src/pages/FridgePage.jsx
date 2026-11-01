@@ -11,21 +11,18 @@ function FridgePage() {
 
   const { fridgeIngredients } = useUserData();
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState(null);
+  // null | "add" | "edit"
+  const [selectedIngredient, setSelectedIngredient] = useState(null);
 
   return (
     <>
       <FridgeHeader />
       <FridgeAlert />
-      <button onClick={() => setIsAddModalOpen(true)}>재료 추가</button>
-      {isAddModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <FridgeAdd setIsAddModalOpen={setIsAddModalOpen} />
-          </div>
-        </div>
-      )}
-
+      <button onClick={() => {
+          setSelectedIngredient(null);
+          setModalMode("add");
+        }}>재료 추가</button>
 
       <div className={styles.cardGrid}>
         {ingredients.map((ingredient) => {
@@ -42,18 +39,33 @@ function FridgePage() {
           if (!isStored) {
               return null;
           }
-
           return (
-              <FridgeCard
-                  key={ingredient.id}
-                  ingredient={ingredient}
-                  onClick={() => {
-                    setIsAddModalOpen(true)
-                  }}
-              />
+            <FridgeCard
+              key={ingredient.id}
+              ingredient={ingredient}
+              onClick={() => {
+                setSelectedIngredient(ingredient);
+                setModalMode("edit");
+              }}
+            />
           );
       })}
     </div>
+
+      {modalMode && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <FridgeAdd
+              mode={modalMode}
+              ingredient={selectedIngredient}
+              onClose={() => {
+                setModalMode(null);
+                setSelectedIngredient(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

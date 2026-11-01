@@ -1,0 +1,95 @@
+/* 로그인·회원가입 화면 공통 스타일 (Figma: Login/Signup - ReciPick FriDge style) */
+.page {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(100%, 440px);
+  padding: 48px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-white);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: -0.64px;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-md);
+  line-height: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formError {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.notice {
+  margin: 0;
+  color: var(--color-disabled);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.switch {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: 20px;
+  text-align: center;
+}
+
+.switch a {
+  margin-left: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.switch a:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 32px 20px;
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+    line-height: 32px;
+  }
+}

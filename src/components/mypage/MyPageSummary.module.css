@@ -1,0 +1,132 @@
+/* 마이페이지 상단 요약 영역 */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.badge {
+  padding: 4px 16px;
+  border-radius: var(--radius-full);
+  background-color: rgb(255 255 255 / 70%);
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: -0.8px;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 16px;
+}
+
+.profileCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  border: 1px solid rgb(233 236 244 / 75%);
+  border-radius: 22px;
+  background-color: rgb(255 255 255 / 96%);
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profileText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profileName {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profileDescription {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.fridgeLink {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  border: 1px solid rgb(233 236 244 / 75%);
+  border-radius: 18px;
+  background-color: rgb(255 255 255 / 96%);
+}
+
+.statLabel {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.statCaption {
+  color: var(--color-disabled);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 900px) {
+  .statGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .profileCard {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

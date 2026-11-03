@@ -138,7 +138,8 @@
 .header-search {
   position: relative;
   width: 256px;
-  flex: none;
+  min-width: 0; /* 칸이 좁으면 검색창이 줄어들도록 (메뉴와 겹침 방지) */
+  flex: 0 1 auto;
 }
 
 .header-search input {

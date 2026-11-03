@@ -1,0 +1,252 @@
+.page {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: 24px var(--layout-padding) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-muted);
+}
+
+.breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.breadcrumb strong {
+  color: var(--color-text);
+}
+
+/* 상단 정보 */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.heroImage {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-xl);
+  background: var(--color-border);
+}
+
+.heroInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.description {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-md);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  margin: 0;
+  padding: 16px;
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+
+.stat dt {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
+.stat dd {
+  margin: 4px 0 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 냉장고 일치 카드 (골격: 계산은 S2) */
+.matchCard {
+  padding: 32px;
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  box-shadow: 0 4px 16px rgb(18 18 18 / 6%);
+}
+
+.matchTitle {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+}
+
+.matchDescription {
+  margin: 8px 0 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* 공통 섹션 */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+}
+
+/* 전체 재료 */
+.ingredientGroups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.group {
+  padding: 20px;
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+}
+
+.groupTitle {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 12px;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+
+.groupTitle span {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.groupList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.groupList li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.groupList li:last-child {
+  border-bottom: 0;
+}
+
+/* 조리 순서 */
+.stepsBadge {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.stepsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepsTime {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+}
+
+.stepTitle {
+  margin: 0 0 8px;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.stepText {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* 비슷한 레시피 */
+.recipeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .ingredientGroups {
+    grid-template-columns: 1fr;
+  }
+
+  .recipeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .recipeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+}

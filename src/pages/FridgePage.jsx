@@ -1,14 +1,13 @@
-import FridgeCard from "../components/fridge/FridgeCard.jsx";
-import FridgeHeader from "../components/fridge/FridgeHeader.jsx";
-import FridgeAlert from "../components/fridge/FridgeAlert.jsx";
-import { ingredients } from "../data/ingredients.js";
+import FridgeCard from '../components/fridge/FridgeCard.jsx';
+import FridgeHeader from '../components/fridge/FridgeHeader.jsx';
+import FridgeAlert from '../components/fridge/FridgeAlert.jsx';
+import { ingredients } from '../data/ingredients.js';
 import styles from '../components/fridge/FridgePage.module.css';
 import { useUserData } from '../contexts/UserDataContext.jsx';
-import FridgeAdd from "../components/fridge/FridgeAdd.jsx";
-import { useState } from "react";
+import FridgeAdd from '../components/fridge/FridgeAdd.jsx';
+import { useState } from 'react';
 
 function FridgePage() {
-
   const { fridgeIngredients } = useUserData();
 
   const [modalMode, setModalMode] = useState(null);
@@ -19,10 +18,14 @@ function FridgePage() {
     <>
       <FridgeHeader />
       <FridgeAlert />
-      <button onClick={() => {
+      <button
+        onClick={() => {
           setSelectedIngredient(null);
-          setModalMode("add");
-        }}>재료 추가</button>
+          setModalMode('add');
+        }}
+      >
+        재료 추가
+      </button>
 
       <div className={styles.cardGrid}>
         {ingredients.map((ingredient) => {
@@ -30,14 +33,14 @@ function FridgePage() {
           let isStored = false;
 
           for (const item of fridgeIngredients) {
-              if (item.ingredientId === ingredient.id) {
-                  isStored = true;
-                  break;
-              }
+            if (item.ingredientId === ingredient.id) {
+              isStored = true;
+              break;
+            }
           }
 
           if (!isStored) {
-              return null;
+            return null;
           }
           return (
             <FridgeCard
@@ -45,12 +48,12 @@ function FridgePage() {
               ingredient={ingredient}
               onClick={() => {
                 setSelectedIngredient(ingredient);
-                setModalMode("edit");
+                setModalMode('edit');
               }}
             />
           );
-      })}
-    </div>
+        })}
+      </div>
 
       {modalMode && (
         <div className={styles.modalOverlay}>
@@ -69,6 +72,5 @@ function FridgePage() {
     </>
   );
 }
-
 
 export default FridgePage;

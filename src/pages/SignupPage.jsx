@@ -46,11 +46,22 @@ function SignupPage() {
 
     setIsSubmitting(true);
     try {
-      await signUp({
+      const { needsEmailConfirmation } = await signUp({
         email: form.email.trim(),
         password: form.password,
         nickname: form.nickname.trim(),
       });
+      // 이메일 인증을 요구하는 설정이면 세션이 없으므로 로그인 화면에서 안내합니다.
+      if (needsEmailConfirmation) {
+        navigate(ROUTES.login, {
+          replace: true,
+          state: {
+            ...location.state,
+            notice: '가입 확인 메일을 보냈어요. 인증 후 로그인해 주세요.',
+          },
+        });
+        return;
+      }
       navigate(getRedirectPath(location.state?.from, ROUTES.home), { replace: true });
     } catch (signUpError) {
       setFormError(signUpError.message);
@@ -66,7 +77,7 @@ function SignupPage() {
             회원가입
           </h1>
           <p className={styles.subtitle}>
-            이메일, 비밀번호, 닉네임만 입력하면 바로 시작할 수 있어요. 가입하면 바로 로그인돼요.
+            이메일, 비밀번호, 닉네임만 입력하면 간단히 시작할 수 있어요.
           </p>
         </header>
 
@@ -126,11 +137,6 @@ function SignupPage() {
           <Link to={ROUTES.login} state={location.state}>
             로그인
           </Link>
-        </p>
-
-        {/* #38에서 Supabase Auth로 교체하면 이 안내를 제거합니다. */}
-        <p className={styles.notice}>
-          현재는 화면 확인용 임시 회원가입으로, 실제 계정은 만들어지지 않습니다.
         </p>
       </div>
     </section>

@@ -1,144 +1,93 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { supabase } from '../utils/supabaseClient.js';
 import { AuthContext } from './useAuth.js';
 
-// S1 화면 개발용 임시 인증입니다. 실제 계정 검증과 데이터 접근 제어는 Supabase Auth/RLS가 맡습니다.
-const MOCK_USER_KEY = 'recipick.mockAuth.user';
+const AUTH_ERROR_MESSAGES = {
+  invalid_credentials: '이메일 또는 비밀번호가 올바르지 않습니다.',
+  user_already_exists: '이미 가입된 이메일입니다.',
+  email_exists: '이미 가입된 이메일입니다.',
+  email_address_invalid: '사용할 수 없는 이메일 주소입니다.',
+  weak_password: '비밀번호가 너무 짧거나 단순합니다.',
+  email_not_confirmed: '이메일 인증을 완료한 뒤 로그인해 주세요.',
+  over_request_rate_limit: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  over_email_send_rate_limit: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  signup_disabled: '현재 회원가입을 할 수 없습니다.',
+};
 
-function readMockUser() {
-  try {
-    const value = window.sessionStorage.getItem(MOCK_USER_KEY);
-    if (!value) return null;
-
-    const user = JSON.parse(value);
-    return typeof user?.id === 'string' && typeof user?.email === 'string' ? user : null;
-  } catch {
-    return null;
-  }
+function toAuthError(error) {
+  const message =
+    AUTH_ERROR_MESSAGES[error?.code] ?? '요청을 처리하지 못했습니다. 다시 시도해 주세요.';
+  return new Error(message, { cause: error });
 }
 
-function saveMockUser(user) {
-  try {
-    window.sessionStorage.setItem(MOCK_USER_KEY, JSON.stringify(user));
-    return true;
-  } catch {
-    return false;
+function requireClient() {
+  if (!supabase) {
+    throw new Error('Supabase 설정이 없어 로그인할 수 없습니다. 관리자에게 문의해 주세요.');
   }
-}
-
-function replaceMockUser(user, hasStoredSession) {
-  if (saveMockUser(user)) return true;
-  if (!hasStoredSession) return false;
-
-  try {
-    window.sessionStorage.removeItem(MOCK_USER_KEY);
-  } catch {
-    throw new Error('이전 임시 로그인 정보를 지울 수 없어 계정을 전환할 수 없습니다.');
-  }
-
-  return false;
-}
-
-function createMockUser(credentials) {
-  const email =
-    typeof credentials?.email === 'string' ? credentials.email.trim().toLowerCase() : '';
-  if (!email) throw new Error('이메일을 입력해 주세요.');
-
-  return {
-    id: `mock:${email}`,
-    email,
-    user_metadata: {},
-  };
+  return supabase;
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(readMockUser);
-  const [hasStoredSession, setHasStoredSession] = useState(Boolean(user));
-  const [storageWarning, setStorageWarning] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(Boolean(supabase));
 
-  const login = useCallback(
-    async (credentials) => {
-      // 비밀번호를 검사하거나 저장하지 않습니다. #38에서 실제 Supabase Auth로 교체합니다.
-      const nextUser = createMockUser(credentials);
-      const isSaved = replaceMockUser(nextUser, hasStoredSession);
-      setHasStoredSession(isSaved);
-      setStorageWarning(!isSaved);
-      setUser(nextUser);
-      return nextUser;
-    },
-    [hasStoredSession],
-  );
+  // 저장된 세션 복원(INITIAL_SESSION)과 로그인·로그아웃·토큰 갱신을 한곳에서 반영합니다.
+  useEffect(() => {
+    if (!supabase) return undefined;
 
-  const signUp = useCallback(
-    async (credentials) => {
-      // 실제 계정은 생성되지 않습니다. 화면 흐름만 확인하는 임시 함수입니다.
-      const nextUser = createMockUser(credentials);
-      const isSaved = replaceMockUser(nextUser, hasStoredSession);
-      setHasStoredSession(isSaved);
-      setStorageWarning(!isSaved);
-      setUser(nextUser);
-      return nextUser;
-    },
-    [hasStoredSession],
-  );
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  const login = useCallback(async ({ email, password }) => {
+    const { data, error } = await requireClient().auth.signInWithPassword({ email, password });
+    if (error) throw toAuthError(error);
+    return data.user;
+  }, []);
+
+  const signUp = useCallback(async ({ email, password, nickname }) => {
+    const { data, error } = await requireClient().auth.signUp({
+      email,
+      password,
+      options: { data: { nickname } },
+    });
+    if (error) throw toAuthError(error);
+    // 이메일 인증을 켠 프로젝트에서는 세션 없이 가입만 완료됩니다.
+    return { user: data.user, needsEmailConfirmation: !data.session };
+  }, []);
 
   const logout = useCallback(async () => {
-    try {
-      window.sessionStorage.removeItem(MOCK_USER_KEY);
-    } catch {
-      if (hasStoredSession) {
-        throw new Error(
-          '임시 로그인 정보를 지울 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.',
-        );
-      }
+    const { error } = await requireClient().auth.signOut();
+    if (error) throw toAuthError(error);
+  }, []);
+
+  const updateProfile = useCallback(async (profile) => {
+    if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
+      throw new Error('수정할 프로필 정보를 확인해 주세요.');
     }
-    setUser(null);
-    setHasStoredSession(false);
-    setStorageWarning(false);
-  }, [hasStoredSession]);
 
-  const updateProfile = useCallback(
-    async (profile) => {
-      if (!user) throw new Error('로그인이 필요합니다.');
-      if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
-        throw new Error('수정할 프로필 정보를 확인해 주세요.');
-      }
-
-      const nextUser = { ...user, user_metadata: { ...user.user_metadata, ...profile } };
-      const isSaved = saveMockUser(nextUser);
-      if (!isSaved && hasStoredSession) {
-        throw new Error('프로필 정보를 저장할 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.');
-      }
-      setHasStoredSession(isSaved);
-      setStorageWarning(!isSaved);
-      setUser(nextUser);
-      return nextUser;
-    },
-    [user, hasStoredSession],
-  );
+    const { data, error } = await requireClient().auth.updateUser({ data: profile });
+    if (error) throw toAuthError(error);
+    return data.user;
+  }, []);
 
   const value = useMemo(
     () => ({
       user,
       isLoggedIn: Boolean(user),
-      isLoading: false,
+      isLoading,
       signUp,
       login,
       logout,
       updateProfile,
     }),
-    [user, signUp, login, logout, updateProfile],
+    [user, isLoading, signUp, login, logout, updateProfile],
   );
 
-  return (
-    <AuthContext value={value}>
-      {user && storageWarning && (
-        <p role="alert">
-          브라우저 저장소에 접근할 수 없어 현재 로그인은 메모리에만 보관됩니다. 새로고침하면 이
-          로그인 상태가 유지되지 않을 수 있습니다.
-        </p>
-      )}
-      {children}
-    </AuthContext>
-  );
+  return <AuthContext value={value}>{children}</AuthContext>;
 }

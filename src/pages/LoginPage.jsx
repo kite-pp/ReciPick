@@ -58,6 +58,12 @@ function LoginPage() {
           </p>
         </header>
 
+        {location.state?.notice && (
+          <p className={styles.notice} role="status">
+            {location.state.notice}
+          </p>
+        )}
+
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <div className={styles.fields}>
             <Input
@@ -102,11 +108,6 @@ function LoginPage() {
           <Link to={ROUTES.signUp} state={location.state}>
             회원가입
           </Link>
-        </p>
-
-        {/* #38에서 Supabase Auth로 교체하면 이 안내를 제거합니다. */}
-        <p className={styles.notice}>
-          현재는 화면 확인용 임시 로그인으로, 비밀번호를 검사하지 않습니다.
         </p>
       </div>
     </section>

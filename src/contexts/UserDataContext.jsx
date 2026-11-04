@@ -1,9 +1,10 @@
 // src/contexts/UserDataContext.jsx
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { STORAGE_KEYS } from '../constants/storageKeys.js';
+import { getUserStorageKey, STORAGE_KEYS } from '../constants/storageKeys.js';
 import { INGREDIENT_UNITS } from '../data/constants.js';
 import { useLocalStorage } from '../hooks/useLocalStorage.js';
+import { useAuth } from './useAuth.js';
 
 const MAX_RECENT_RECIPES = 10;
 
@@ -37,10 +38,25 @@ function validateFridgeFields({ quantity, unit, expiresAt }) {
 }
 
 export function UserDataProvider({ children }) {
-  const [storedFridge, setStoredFridge] = useLocalStorage(STORAGE_KEYS.fridgeIngredients, []);
-  const [favorites, setFavorites] = useLocalStorage(STORAGE_KEYS.favorites, []);
-  const [storedShopping, setStoredShopping] = useLocalStorage(STORAGE_KEYS.shoppingList, []);
-  const [recentRecipes, setRecentRecipes] = useLocalStorage(STORAGE_KEYS.recentRecipes, []);
+  // 로그인한 계정별로 저장 키를 나눠 다른 계정의 데이터가 보이지 않게 합니다.
+  const { user } = useAuth();
+  const userId = user?.id;
+  const [storedFridge, setStoredFridge] = useLocalStorage(
+    getUserStorageKey(STORAGE_KEYS.fridgeIngredients, userId),
+    [],
+  );
+  const [favorites, setFavorites] = useLocalStorage(
+    getUserStorageKey(STORAGE_KEYS.favorites, userId),
+    [],
+  );
+  const [storedShopping, setStoredShopping] = useLocalStorage(
+    getUserStorageKey(STORAGE_KEYS.shoppingList, userId),
+    [],
+  );
+  const [recentRecipes, setRecentRecipes] = useLocalStorage(
+    getUserStorageKey(STORAGE_KEYS.recentRecipes, userId),
+    [],
+  );
 
   const fridgeIngredients = useMemo(() => storedFridge.filter(isItemObject), [storedFridge]);
   const shoppingList = useMemo(() => storedShopping.filter(isItemObject), [storedShopping]);

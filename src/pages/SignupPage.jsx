@@ -77,7 +77,7 @@ function SignupPage() {
             회원가입
           </h1>
           <p className={styles.subtitle}>
-            이메일, 비밀번호, 닉네임만 입력하면 바로 시작할 수 있어요. 가입하면 바로 로그인돼요.
+            이메일, 비밀번호, 닉네임만 입력하면 간단히 시작할 수 있어요.
           </p>
         </header>
 

@@ -95,32 +95,194 @@
 .statCard {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 20px;
+  gap: 7px;
+  padding: 22px;
   border: 1px solid rgb(233 236 244 / 75%);
-  border-radius: 18px;
+  border-radius: 22px;
   background-color: rgb(255 255 255 / 96%);
 }
 
 .statLabel {
+  color: var(--color-disabled);
+  font-size: var(--font-size-xs);
+}
+
+.statValue {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.statCaption {
+  color: var(--color-success);
+  font-size: 11px;
+}
+
+/* 선호 카테고리 + 바로가기 */
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  border: 1px solid rgb(233 236 244 / 75%);
+  border-radius: 22px;
+  background-color: rgb(255 255 255 / 96%);
+}
+
+.categoryDescription,
+.categoryEmpty {
+  margin: 0;
+  color: var(--color-disabled);
+  font-size: var(--font-size-xs);
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categoryRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.categoryLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.categoryName {
   color: var(--color-muted);
+  font-size: 13px;
+}
+
+.categoryPercent {
+  color: var(--color-disabled);
   font-size: var(--font-size-xs);
   font-weight: 500;
 }
 
-.statValue {
-  font-size: var(--font-size-xl);
+.barTrack {
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-soft);
+}
+
+.barFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}
+
+.shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shortcutList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortcutCard {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgb(233 236 244 / 75%);
+  border-radius: 22px;
+  background-color: rgb(255 255 255 / 96%);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+.shortcutCard:hover {
+  border-color: var(--color-disabled);
+}
+
+.shortcutCard:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.shortcutText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shortcutTitle {
+  font-size: var(--font-size-md);
+  font-weight: 500;
+}
+
+.shortcutDescription {
+  color: var(--color-disabled);
+  font-size: 11px;
+}
+
+.shortcutArrow {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 이번 주 ReciPick 배너 */
+.weeklyBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 26px;
+  border: 1px solid rgb(233 236 244 / 75%);
+  border-radius: 22px;
+  background-color: #ffe633;
+}
+
+.weeklyTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
   font-weight: 700;
 }
 
-.statCaption {
-  color: var(--color-disabled);
-  font-size: var(--font-size-xs);
+.weeklyText {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
 }
 
 @media (max-width: 900px) {
   .statGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

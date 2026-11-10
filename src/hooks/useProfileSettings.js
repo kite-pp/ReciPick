@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { supabase } from '../utils/supabaseClient.js';
 
@@ -46,6 +46,8 @@ export function useProfileSettings(userId) {
   });
   const [saveError, setSaveError] = useState('');
   const [pendingSaves, setPendingSaves] = useState(0);
+  const saveQueueRef = useRef(Promise.resolve());
+  const latestSaveIdRef = useRef(0);
 
   const loadKey = userId && supabase ? `${userId}:${reloadCount}` : null;
 
@@ -58,14 +60,24 @@ export function useProfileSettings(userId) {
       .select(PROFILE_COLUMNS)
       .eq('id', userId)
       .maybeSingle()
-      .then(({ data, error }) => {
-        if (ignore) return;
-        setLoaded({
-          key: loadKey,
-          settings: error ? DEFAULT_PROFILE_SETTINGS : fromRow(data),
-          error: error ? '설정을 불러오지 못했습니다.' : '',
-        });
-      });
+      .then(
+        ({ data, error }) => {
+          if (ignore) return;
+          setLoaded({
+            key: loadKey,
+            settings: error ? DEFAULT_PROFILE_SETTINGS : fromRow(data),
+            error: error ? '설정을 불러오지 못했습니다.' : '',
+          });
+        },
+        () => {
+          if (ignore) return;
+          setLoaded({
+            key: loadKey,
+            settings: DEFAULT_PROFILE_SETTINGS,
+            error: '설정을 불러오지 못했습니다.',
+          });
+        },
+      );
 
     return () => {
       ignore = true;
@@ -77,24 +89,38 @@ export function useProfileSettings(userId) {
     setReloadCount((count) => count + 1);
   }, []);
 
-  // 화면에 먼저 반영한 뒤 저장하고, 실패하면 DB 값을 다시 불러와 되돌립니다.
+  // 화면에 먼저 반영한 뒤 순서대로 저장합니다. 연속 변경 시 마지막 요청이 DB의 최종 값이 되며,
+  // 마지막 요청이 실패했을 때만 오류를 표시하고 DB 값을 다시 불러와 되돌립니다.
   const saveSettings = useCallback(
-    async (nextSettings) => {
-      if (!supabase || !userId) return;
+    (nextSettings) => {
+      if (!supabase || !userId) return Promise.resolve();
 
+      const saveId = ++latestSaveIdRef.current;
       setLoaded((prev) => ({ ...prev, settings: nextSettings }));
       setSaveError('');
       setPendingSaves((count) => count + 1);
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({ id: userId, ...toRow(nextSettings), updated_at: new Date().toISOString() });
+      const runSave = async () => {
+        let failed;
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .upsert({ id: userId, ...toRow(nextSettings), updated_at: new Date().toISOString() });
+          failed = Boolean(error);
+        } catch {
+          failed = true;
+        } finally {
+          setPendingSaves((count) => count - 1);
+        }
 
-      setPendingSaves((count) => count - 1);
-      if (error) {
-        setSaveError('설정을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
-        setReloadCount((count) => count + 1);
-      }
+        if (failed && saveId === latestSaveIdRef.current) {
+          setSaveError('설정을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+          setReloadCount((count) => count + 1);
+        }
+      };
+
+      saveQueueRef.current = saveQueueRef.current.then(runSave);
+      return saveQueueRef.current;
     },
     [userId],
   );

@@ -1,6 +1,8 @@
 name: '🔧 설정·환경 작업'
 description: '패키지, 빌드, CI/CD 또는 저장소 설정을 변경합니다.'
 title: '[CHORE] '
+labels:
+  - chore
 body:
   - type: dropdown
     id: area

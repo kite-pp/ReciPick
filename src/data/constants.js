@@ -9,3 +9,5 @@ export const COOKING_TIME_FILTERS = [
   { label: '30분 이하', maxMinutes: 30 },
   { label: '60분 이하', maxMinutes: 60 },
 ];
+
+export const INGREDIENT_UNITS = ['개', '대', 'g', 'kg', 'ml', 'L', '봉', '팩', '모', '병', '캔'];

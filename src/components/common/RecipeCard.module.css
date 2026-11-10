@@ -1,0 +1,140 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background-color: var(--color-white);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -2px rgb(0 0 0 / 10%);
+}
+
+/* 이미지 + 위에 겹치는 배지, 찜 버튼 */
+.imageBox {
+  position: relative;
+  height: 243px;
+  background-color: var(--color-background);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.matchBadge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background-color: rgb(255 255 255 / 85%);
+  color: #047857;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 12px;
+}
+
+.favoriteButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 80%);
+  color: var(--color-text);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* 글자 영역 */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+}
+
+.category {
+  margin: 0;
+  color: #8b5018;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  line-height: 24px;
+}
+
+/* 설명은 2줄까지만 */
+.description {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: 22px;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.infoList {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+
+.info {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-background);
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+}
+
+/* 구분선 아래 (부족 재료 + 버튼) */
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid var(--color-border);
+}
+
+.missing {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.detailLink {
+  display: block;
+  padding: 10px 0;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+}
+
+.detailLink:hover {
+  background-color: #333333;
+}

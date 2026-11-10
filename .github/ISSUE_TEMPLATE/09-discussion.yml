@@ -1,6 +1,8 @@
 name: '💬 기술 논의'
 description: '구조, 규칙 또는 구현 방향에 대한 팀 결정을 요청합니다.'
 title: '[DISCUSS] '
+labels:
+  - discussion
 body:
   - type: textarea
     id: context

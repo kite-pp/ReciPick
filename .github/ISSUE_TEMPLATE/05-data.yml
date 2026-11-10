@@ -1,6 +1,8 @@
 name: '🗂️ Mock Data'
 description: '레시피, 재료 또는 공통 상수 데이터를 추가·수정합니다.'
 title: '[DATA] '
+labels:
+  - data
 body:
   - type: dropdown
     id: data_type

@@ -2,6 +2,8 @@ export const ROUTES = Object.freeze({
   home: '/',
   recipes: '/recipes',
   recipeDetail: '/recipes/:id',
+  login: '/login',
+  signUp: '/signup',
   fridge: '/fridge',
   recommend: '/recommend',
   favorites: '/favorites',

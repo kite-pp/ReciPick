@@ -1,0 +1,199 @@
+/* 마이페이지 하단 설정 영역 (Figma: MyPage > Settings) */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.2px;
+}
+
+.subtitle,
+.sectionDescription {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  border: 1px solid rgb(233 236 244 / 75%);
+  border-radius: 22px;
+  background-color: rgb(255 255 255 / 96%);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.18px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background-color: var(--color-border);
+}
+
+.nicknameRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.nicknameInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chipButton {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* 공통 SearchBar의 최대 너비(480px)를 카드 너비에 맞춤 */
+.search > * {
+  max-width: none;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-disabled);
+  font-size: var(--font-size-sm);
+  line-height: 20px;
+}
+
+.notificationList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notificationRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.notificationText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.notificationTitle {
+  font-size: var(--font-size-md);
+  line-height: 24px;
+}
+
+.toggle {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.toggle::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 15%);
+  content: '';
+  transition: transform 160ms ease;
+}
+
+.toggle[aria-checked='true'] {
+  background-color: var(--color-success);
+}
+
+.toggle[aria-checked='true']::after {
+  transform: translateX(20px);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .toggle::after {
+    transition: none;
+  }
+}

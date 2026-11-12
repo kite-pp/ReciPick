@@ -1,0 +1,55 @@
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+/* 기본 체크박스 대신 동그라미 모양으로 표시 */
+.checkLabel input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid #e4e8ee;
+  border-radius: 50%;
+  background: #fff;
+  appearance: none;
+  cursor: pointer;
+}
+
+.checkLabel input:checked {
+  border-color: #3f9469;
+  background: #3f9469;
+}
+
+.name {
+  color: #202124;
+  font-size: 15px;
+}
+
+.checked {
+  color: #9da2a8;
+}
+
+.removeButton {
+  padding: 8px 64px 8px 8px;
+  border: 0;
+  background: transparent;
+  color: #202124;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .removeButton {
+    padding-right: 8px;
+  }
+}

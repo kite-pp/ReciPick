@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import Badge from '../components/common/Badge.jsx';
@@ -5,6 +6,7 @@ import Button from '../components/common/Button.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import RecipeCard from '../components/common/RecipeCard.jsx';
 import { ROUTES } from '../constants/routes.js';
+import { useAuth } from '../contexts/useAuth.js';
 import { useUserData } from '../contexts/UserDataContext.jsx';
 import { ingredients } from '../data/ingredients.js';
 import { recipes } from '../data/recipes.js';
@@ -20,8 +22,15 @@ function RecipeDetailPage() {
   const { id } = useParams();
   const recipe = recipes.find((item) => item.id === Number(id));
 
-  const { isFavorite, toggleFavorite } = useUserData();
+  const { user } = useAuth();
+  const { isFavorite, toggleFavorite, addRecentlyViewed } = useUserData();
   const requireLogin = useRequireLogin();
+
+  // 로그인 사용자가 존재하는 레시피를 열면 최근 본 레시피에 기록합니다.
+  const recipeId = recipe?.id;
+  useEffect(() => {
+    if (user && recipeId !== undefined) addRecentlyViewed(recipeId);
+  }, [user, recipeId, addRecentlyViewed]);
 
   if (!recipe) {
     return (

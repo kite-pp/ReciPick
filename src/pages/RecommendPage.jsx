@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Badge from '../components/common/Badge.jsx';
+import Button from '../components/common/Button.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import { ROUTES } from '../constants/routes.js';
 import { useUserData } from '../contexts/UserDataContext.jsx';
@@ -30,6 +31,7 @@ function RecommendPage() {
   const navigate = useNavigate();
   const { fridgeIngredients } = useUserData();
   const [selected, setSelected] = useState({ category: ALL, time: ALL, difficulty: ALL });
+  const [applied, setApplied] = useState(null); // null이면 아직 추천받기 전
 
   const fridgeNames = fridgeIngredients
     .slice(0, PREVIEW_INGREDIENT_COUNT)
@@ -37,19 +39,18 @@ function RecommendPage() {
     .filter(Boolean)
     .join(', ');
 
-  const results = useMemo(
-    () =>
-      getRecommendations({
-        recipes,
-        fridgeIngredients,
-        filters: {
-          category: selected.category === ALL ? null : selected.category,
-          difficulty: selected.difficulty === ALL ? null : selected.difficulty,
-          maxMinutes: selected.time === ALL ? null : Number.parseInt(selected.time, 10),
-        },
-      }),
-    [fridgeIngredients, selected],
-  );
+  const results = useMemo(() => {
+    if (!applied) return [];
+    return getRecommendations({
+      recipes,
+      fridgeIngredients,
+      filters: {
+        category: applied.category === ALL ? null : applied.category,
+        difficulty: applied.difficulty === ALL ? null : applied.difficulty,
+        maxMinutes: applied.time === ALL ? null : Number.parseInt(applied.time, 10),
+      },
+    });
+  }, [fridgeIngredients, applied]);
   const [main, ...subs] = results.slice(0, 3);
 
   const getNames = (items) =>
@@ -57,6 +58,10 @@ function RecommendPage() {
 
   const handleSelect = (key, option) => {
     setSelected((prev) => ({ ...prev, [key]: option }));
+  };
+
+  const handleRecommend = () => {
+    setApplied(selected);
   };
 
   if (fridgeIngredients.length === 0) {
@@ -123,9 +128,14 @@ function RecommendPage() {
             </div>
           ))}
         </div>
+        <div className={styles.submitRow}>
+          <Button size="large" onClick={handleRecommend}>
+            내 냉장고로 메뉴 추천받기
+          </Button>
+        </div>
       </section>
 
-      {!main ? (
+      {!applied ? null : !main ? (
         <EmptyState
           icon="🔍"
           title="조건에 맞는 추천 메뉴가 없어요"

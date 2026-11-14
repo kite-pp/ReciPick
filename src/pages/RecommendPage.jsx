@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Badge from '../components/common/Badge.jsx';
@@ -9,28 +9,29 @@ import { useUserData } from '../contexts/UserDataContext.jsx';
 import { COOKING_TIME_FILTERS, DIFFICULTIES, RECIPE_CATEGORIES } from '../data/constants.js';
 import { ingredients } from '../data/ingredients.js';
 import { recipes } from '../data/recipes.js';
+import { getRecommendations } from '../utils/recommendation.js';
 import styles from './RecommendPage.module.css';
 
-const ALL = '전체';
+const ALL = '상관없어요';
 const PREVIEW_INGREDIENT_COUNT = 5;
 
 const ingredientMap = new Map(ingredients.map((item) => [item.id, item]));
 
 const FILTER_GROUPS = [
-  { key: 'category', title: '어떤 음식이 당기나요?', options: [ALL, ...RECIPE_CATEGORIES] },
+  { key: 'category', title: '어떤 음식이 당기나요?', options: [...RECIPE_CATEGORIES, ALL] },
   {
     key: 'time',
     title: '요리 시간 여유는요?',
-    options: [ALL, ...COOKING_TIME_FILTERS.map((filter) => filter.label)],
+    options: [...COOKING_TIME_FILTERS.map((filter) => filter.label), ALL],
   },
-  { key: 'difficulty', title: '원하는 요리 난이도는?', options: [ALL, ...DIFFICULTIES] },
+  { key: 'difficulty', title: '원하는 요리 난이도는?', options: [...DIFFICULTIES, ALL] },
 ];
 
 function RecommendPage() {
   const navigate = useNavigate();
   const { fridgeIngredients } = useUserData();
   const [selected, setSelected] = useState({ category: ALL, time: ALL, difficulty: ALL });
-  const [hasResult, setHasResult] = useState(false);
+  const [applied, setApplied] = useState(null); // null이면 아직 추천받기 전
 
   const fridgeNames = fridgeIngredients
     .slice(0, PREVIEW_INGREDIENT_COUNT)
@@ -38,15 +39,29 @@ function RecommendPage() {
     .filter(Boolean)
     .join(', ');
 
-  // 골격 - 계산 없이 앞 3개 표시
-  const [mainRecipe, ...subRecipes] = recipes.slice(0, 3);
+  const results = useMemo(() => {
+    if (!applied) return [];
+    return getRecommendations({
+      recipes,
+      fridgeIngredients,
+      filters: {
+        category: applied.category === ALL ? null : applied.category,
+        difficulty: applied.difficulty === ALL ? null : applied.difficulty,
+        maxMinutes: applied.time === ALL ? null : Number.parseInt(applied.time, 10),
+      },
+    });
+  }, [fridgeIngredients, applied]);
+  const [main, ...subs] = results.slice(0, 3);
+
+  const getNames = (items) =>
+    items.map((item) => ingredientMap.get(item.ingredientId)?.name).filter(Boolean);
 
   const handleSelect = (key, option) => {
     setSelected((prev) => ({ ...prev, [key]: option }));
   };
 
   const handleRecommend = () => {
-    setHasResult(true);
+    setApplied(selected);
   };
 
   if (fridgeIngredients.length === 0) {
@@ -120,61 +135,68 @@ function RecommendPage() {
         </div>
       </section>
 
-      {/* 추천 결과 - 골격 */}
-      {hasResult && mainRecipe && (
+      {!applied ? null : !main ? (
+        <EmptyState
+          icon="🔍"
+          title="조건에 맞는 추천 메뉴가 없어요"
+          description="필터를 바꾸거나 냉장고 재료를 더 등록해 보세요."
+        />
+      ) : (
         <>
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>오늘의 추천 메뉴</h2>
-            <p className={styles.sectionSub}>보유 재료 일치율이 가장 높은 메뉴예요.</p>
             <article className={styles.mainCard}>
-              <img className={styles.mainImage} src={mainRecipe.image} alt={mainRecipe.title} />
+              <img className={styles.mainImage} src={main.recipe.image} alt={main.recipe.title} />
               <div className={styles.mainInfo}>
-                <Badge>{mainRecipe.category}</Badge>
-                <h3 className={styles.mainTitle}>{mainRecipe.title}</h3>
-                <p className={styles.mainDescription}>{mainRecipe.description}</p>
-                <dl className={styles.stats}>
-                  <div>
-                    <dt>조리 시간</dt>
-                    <dd>{mainRecipe.cookingTime}분</dd>
-                  </div>
-                  <div>
-                    <dt>난이도</dt>
-                    <dd>{mainRecipe.difficulty}</dd>
-                  </div>
-                  <div>
-                    <dt>기준 분량</dt>
-                    <dd>{mainRecipe.servings}인분</dd>
-                  </div>
-                </dl>
+                <Badge color="green">내 재료 {main.matchRate}% 일치</Badge>
+                <h3 className={styles.mainTitle}>{main.recipe.title}</h3>
+                <p className={styles.mainDescription}>{main.recipe.description}</p>
                 <p className={styles.placeholder}>
-                  보유·부족 재료와 일치율은 추천 기능 연결 후 표시됩니다.
+                  보유한 재료 {main.ownedIngredients.length}개:{' '}
+                  {getNames(main.ownedIngredients).join(', ')}
                 </p>
-                <Link to={`/recipes/${mainRecipe.id}`} className={styles.detailLink}>
+                <p className={styles.placeholder}>
+                  {main.isCookable
+                    ? '모든 필수 재료가 냉장고에 준비되어 있어요.'
+                    : `부족한 재료 ${main.missingIngredients.length}개: ${getNames(main.missingIngredients).join(', ')}`}
+                </p>
+                <Link to={`/recipes/${main.recipe.id}`} className={styles.detailLink}>
                   레시피 보기
                 </Link>
               </div>
             </article>
           </section>
 
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>함께 고민할 만한 대체 추천 메뉴 (TOP 2, 3)</h2>
-            <div className={styles.subGrid}>
-              {subRecipes.map((recipe, index) => (
-                <Link key={recipe.id} to={`/recipes/${recipe.id}`} className={styles.subCard}>
-                  <img className={styles.subImage} src={recipe.image} alt={recipe.title} />
-                  <div className={styles.subInfo}>
-                    <span className={styles.rank}>TOP {index + 2}</span>
-                    <Badge>{recipe.category}</Badge>
-                    <h3 className={styles.subTitle}>{recipe.title}</h3>
-                    <p className={styles.subDescription}>{recipe.description}</p>
-                    <span className={styles.subMeta}>
-                      {recipe.cookingTime}분 · {recipe.difficulty}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
+          {subs.length > 0 && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>대체 추천 메뉴 (TOP 2, 3)</h2>
+              <div className={styles.subGrid}>
+                {subs.map((item, index) => (
+                  <Link
+                    key={item.recipe.id}
+                    to={`/recipes/${item.recipe.id}`}
+                    className={styles.subCard}
+                  >
+                    <img
+                      className={styles.subImage}
+                      src={item.recipe.image}
+                      alt={item.recipe.title}
+                    />
+                    <div className={styles.subInfo}>
+                      <span className={styles.rank}>TOP {index + 2}</span>
+                      <Badge color="green">{item.matchRate}% 일치</Badge>
+                      <h3 className={styles.subTitle}>{item.recipe.title}</h3>
+                      {item.missingIngredients.length > 0 && (
+                        <span className={styles.subMeta}>
+                          부족: {getNames(item.missingIngredients).join(', ')}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </>
       )}
     </div>

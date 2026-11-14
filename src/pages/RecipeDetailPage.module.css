@@ -89,7 +89,109 @@
   gap: 8px;
 }
 
-/* 냉장고 일치 카드 (골격: 계산은 S2) */
+/* 냉장고 일치 카드 */
+.matchHead {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.matchIcon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  font-size: 24px;
+}
+
+.matchTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.progressBox {
+  padding: 16px 20px;
+  border-radius: var(--radius-xl);
+  background: var(--color-primary-soft);
+}
+
+.progressHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: var(--font-size-sm);
+}
+
+.progressTrack {
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+
+.matchLists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+  align-items: start;
+}
+
+.listBox {
+  padding: 20px;
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+}
+
+.listTitle {
+  margin: 0 0 12px;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  font-size: var(--font-size-sm);
+}
+
+.itemName {
+  display: block;
+  font-weight: 600;
+}
+
+.itemAmount {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
 .matchCard {
   padding: 32px;
   border-radius: var(--radius-xl);
@@ -232,7 +334,8 @@
 
 @media (max-width: 900px) {
   .hero,
-  .ingredientGroups {
+  .ingredientGroups,
+  .matchLists {
     grid-template-columns: 1fr;
   }
 

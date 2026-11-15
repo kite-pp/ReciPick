@@ -61,7 +61,6 @@
 
 .app-main {
   position: relative;
-  z-index: 0;
   width: 100%;
   flex: 1;
 }

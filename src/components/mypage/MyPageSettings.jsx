@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button.jsx';
 import IngredientChip from '../common/IngredientChip.jsx';
 import Input from '../common/Input.jsx';
+import Loading from '../common/Loading.jsx';
 import SearchBar from '../common/SearchBar.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { useAuth } from '../../contexts/useAuth.js';
 import { RECIPE_CATEGORIES } from '../../data/constants.js';
 import { ingredients } from '../../data/ingredients.js';
+import { useProfileSettings } from '../../hooks/useProfileSettings.js';
 import styles from './MyPageSettings.module.css';
 
 const MAX_SEARCH_RESULTS = 8;
@@ -32,25 +34,24 @@ const NOTIFICATION_OPTIONS = [
 ];
 
 // 마이페이지 하단 설정 영역
-// 닉네임만 AuthContext.updateProfile로 저장하고, 취향·제외 재료·알림은 #47에서 사용자별 저장을 연결합니다.
+// 닉네임은 AuthContext.updateProfile로, 취향·제외 재료·알림은 profiles 테이블에 바로 저장합니다.
 function MyPageSettings() {
   const { user, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
+  const { settings, isLoading, loadError, saveError, isSaving, saveSettings, reload } =
+    useProfileSettings(user?.id);
 
   const [nickname, setNickname] = useState(user?.user_metadata?.nickname ?? '');
   const [nicknameError, setNicknameError] = useState('');
   const [nicknameMessage, setNicknameMessage] = useState('');
-  const [preferredCategories, setPreferredCategories] = useState([]);
   const [keyword, setKeyword] = useState('');
-  const [excludedIds, setExcludedIds] = useState([]);
-  const [notifications, setNotifications] = useState({
-    expiry: true,
-    recommendation: false,
-    shopping: false,
-  });
   const [accountError, setAccountError] = useState('');
 
   if (!user) return null;
+
+  const { preferredCategories, excludedIngredientIds: excludedIds, notifications } = settings;
+  // 불러오기 전이나 실패한 상태에서 기본값으로 저장해 기존 설정을 덮어쓰지 않도록 막습니다.
+  const isReady = !isLoading && !loadError;
 
   const trimmedKeyword = keyword.trim();
   const searchResults = trimmedKeyword
@@ -82,18 +83,28 @@ function MyPageSettings() {
   };
 
   const toggleCategory = (category) => {
-    setPreferredCategories((prev) =>
-      prev.includes(category) ? prev.filter((item) => item !== category) : [...prev, category],
-    );
+    if (!isReady) return;
+    saveSettings({
+      ...settings,
+      preferredCategories: preferredCategories.includes(category)
+        ? preferredCategories.filter((item) => item !== category)
+        : [...preferredCategories, category],
+    });
   };
 
   const addExcluded = (ingredientId) => {
-    setExcludedIds((prev) => (prev.includes(ingredientId) ? prev : [...prev, ingredientId]));
+    if (!isReady) return;
     setKeyword('');
+    if (excludedIds.includes(ingredientId)) return;
+    saveSettings({ ...settings, excludedIngredientIds: [...excludedIds, ingredientId] });
   };
 
   const removeExcluded = (ingredientId) => {
-    setExcludedIds((prev) => prev.filter((id) => id !== ingredientId));
+    if (!isReady) return;
+    saveSettings({
+      ...settings,
+      excludedIngredientIds: excludedIds.filter((id) => id !== ingredientId),
+    });
   };
 
   const handleSearchSubmit = () => {
@@ -101,7 +112,8 @@ function MyPageSettings() {
   };
 
   const toggleNotification = (key) => {
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+    if (!isReady) return;
+    saveSettings({ ...settings, notifications: { ...notifications, [key]: !notifications[key] } });
   };
 
   const handleLogout = async () => {
@@ -120,6 +132,23 @@ function MyPageSettings() {
           설정
         </h2>
         <p className={styles.subtitle}>내 정보, 음식 취향, 알림을 관리하세요.</p>
+        <p className={styles.saveStatus} role="status">
+          {isSaving ? '저장 중...' : ''}
+        </p>
+        {saveError && (
+          <p className={styles.error} role="alert">
+            {saveError}
+          </p>
+        )}
+        {isLoading && <Loading text="설정을 불러오는 중..." />}
+        {loadError && (
+          <div className={styles.loadError} role="alert">
+            <p className={styles.error}>{loadError}</p>
+            <Button variant="secondary" size="small" onClick={reload}>
+              다시 시도
+            </Button>
+          </div>
+        )}
       </header>
 
       <div className={styles.row}>
@@ -175,6 +204,7 @@ function MyPageSettings() {
                     type="button"
                     className={styles.chipButton}
                     aria-pressed={isSelected}
+                    disabled={!isReady}
                     onClick={() => toggleCategory(category)}
                   >
                     <IngredientChip label={category} state={isSelected ? 'selected' : 'default'} />
@@ -213,6 +243,7 @@ function MyPageSettings() {
                       <button
                         type="button"
                         className={styles.chipButton}
+                        disabled={!isReady}
                         onClick={() => addExcluded(ingredient.id)}
                         aria-label={ingredient.name + ' 제외 재료로 추가'}
                       >
@@ -233,7 +264,7 @@ function MyPageSettings() {
                     <IngredientChip
                       label={ingredient.name}
                       state="selected"
-                      onRemove={() => removeExcluded(ingredient.id)}
+                      onRemove={isReady ? () => removeExcluded(ingredient.id) : undefined}
                     />
                   </li>
                 ))}
@@ -269,6 +300,7 @@ function MyPageSettings() {
                     className={styles.toggle}
                     aria-checked={notifications[option.key]}
                     aria-labelledby={`notification-${option.key}`}
+                    disabled={!isReady}
                     onClick={() => toggleNotification(option.key)}
                   />
                 </li>

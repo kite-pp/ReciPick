@@ -194,3 +194,26 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 카테고리 줄 + 필터 초기화 버튼 */
+.categoryRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.resetButton {
+  flex: none;
+  padding: 8px 4px;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-disabled);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.resetButton:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}

@@ -1,0 +1,164 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header span {
+  color: #202124;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.header h1 {
+  margin: 6px 0;
+  color: #202124;
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.header p {
+  margin: 0;
+  color: #9da2a8;
+  font-size: 14px;
+}
+
+.header button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 20px;
+  border: 1px solid #202124;
+  border-radius: 999px;
+  background: #fff;
+  color: #202124;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.summaryCard {
+  padding: 22px 20px;
+  border: 1px solid #eef0f2;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.summaryCard span {
+  color: #9da2a8;
+  font-size: 12px;
+}
+
+.summaryCard strong {
+  display: block;
+  margin: 6px 0 10px;
+  color: #202124;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.summaryCard p {
+  margin: 0;
+  color: #13a875;
+  font-size: 11px;
+}
+
+.listBox {
+  padding: 28px;
+  border: 1px solid #eef0f2;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.listBox h2 {
+  margin: 0;
+  color: #202124;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.listBox > p {
+  margin: 4px 0 8px;
+  color: #9da2a8;
+  font-size: 12px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.empty strong {
+  color: #202124;
+  font-size: 15px;
+}
+
+.empty span {
+  color: #9da2a8;
+  font-size: 13px;
+}
+
+.tip {
+  padding: 22px;
+  border: 1px solid #ddf3e6;
+  border-radius: 20px;
+  background: #eaf7ef;
+}
+
+.tip h3 {
+  margin: 0 0 6px;
+  color: #13a875;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tip p {
+  margin: 0;
+  color: #202124;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .listBox {
+    padding: 20px;
+  }
+}

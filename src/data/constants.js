@@ -5,9 +5,9 @@ export const DIFFICULTIES = ['쉬움', '보통', '어려움'];
 export const INGREDIENT_CATEGORIES = ['채소', '육류', '해산물', '유제품', '곡류', '양념', '기타'];
 
 export const COOKING_TIME_FILTERS = [
-  { label: '15분 이하', maxMinutes: 15 },
-  { label: '30분 이하', maxMinutes: 30 },
-  { label: '60분 이하', maxMinutes: 60 },
+  { label: '15분 이내', maxMinutes: 15 },
+  { label: '30분 이내', maxMinutes: 30 },
+  { label: '60분 이내', maxMinutes: 60 },
 ];
 
 export const INGREDIENT_UNITS = ['개', '대', 'g', 'kg', 'ml', 'L', '봉', '팩', '모', '병', '캔'];

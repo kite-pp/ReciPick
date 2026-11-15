@@ -178,6 +178,10 @@ export function UserDataProvider({ children }) {
     [setRecentRecipes],
   );
 
+  const clearRecentlyViewed = useCallback(async () => {
+    setRecentRecipes([]);
+  }, [setRecentRecipes]);
+
   const value = useMemo(
     () => ({
       fridgeIngredients,
@@ -196,6 +200,7 @@ export function UserDataProvider({ children }) {
       isInShoppingList,
       recentRecipes,
       addRecentlyViewed,
+      clearRecentlyViewed,
       isLoading: false, // 1단계(localStorage)는 즉시 읽으므로 항상 false
     }),
     [
@@ -215,6 +220,7 @@ export function UserDataProvider({ children }) {
       isInShoppingList,
       recentRecipes,
       addRecentlyViewed,
+      clearRecentlyViewed,
     ],
   );
 

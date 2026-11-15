@@ -1,0 +1,139 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+  box-sizing: border-box;
+}
+
+.titleBox p {
+  max-width: 600px;
+  margin: 0;
+  color: #68707d;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f1f3f5;
+  color: #202124;
+  font-size: 11px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.titleRow h1 {
+  margin: 0;
+  color: #202124;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #202124;
+}
+
+.rightBox {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.countCard {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 22px;
+  border: 1px solid #eef0f2;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(42 52 65 / 6%);
+}
+
+.countCard span {
+  color: #68707d;
+  font-size: 11px;
+}
+
+.countCard strong {
+  display: block;
+  margin-top: 4px;
+  color: #202124;
+  font-size: 22px;
+}
+
+.countCard small {
+  color: #68707d;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.statusBadges {
+  display: flex;
+  gap: 6px;
+}
+
+.statusBadges span {
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.statusBadges .fresh {
+  background: #e8fbf3;
+  color: #13a875;
+}
+
+.statusBadges .soon {
+  background: #fff8e6;
+  color: #d97706;
+}
+
+.addButton {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #202124;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .titleRow h1 {
+    font-size: 26px;
+  }
+
+  .rightBox {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .countCard {
+    justify-content: space-between;
+  }
+}

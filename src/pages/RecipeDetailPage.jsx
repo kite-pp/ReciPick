@@ -11,7 +11,12 @@ import { useUserData } from '../contexts/UserDataContext.jsx';
 import { ingredients } from '../data/ingredients.js';
 import { recipes } from '../data/recipes.js';
 import { useRequireLogin } from '../hooks/useRequireLogin.js';
-import { getRecipeMatch, getRecommendations } from '../utils/recommendation.js';
+import { useProfileSettings } from '../hooks/useProfileSettings.js';
+import {
+  getRecipeMatch,
+  getRecommendations,
+  getUsableIngredientIds,
+} from '../utils/recommendation.js';
 import styles from './RecipeDetailPage.module.css';
 
 const SIMILAR_RECIPE_COUNT = 3;
@@ -50,6 +55,7 @@ function RecipeDetailPage() {
     addShoppingItems,
     addRecentlyViewed,
   } = useUserData();
+  const { settings: profileSettings } = useProfileSettings(user?.id);
   const requireLogin = useRequireLogin();
 
   // 로그인 사용자가 존재하는 레시피를 열면 최근 본 레시피에 기록합니다.
@@ -79,11 +85,8 @@ function RecipeDetailPage() {
     (item) => item.info?.category === SEASONING_CATEGORY,
   );
 
-  // 보유/부족 재료 구분
-  const match = getRecipeMatch(
-    recipe,
-    fridgeIngredients.map((item) => item.ingredientId),
-  );
+  // 보유/부족 재료 구분 (추천과 같은 기준: 소비기한 지난 재료는 부족으로 계산)
+  const match = getRecipeMatch(recipe, getUsableIngredientIds(fridgeIngredients));
   // 이미 장보기 목록에 있는 재료는 제외 (중복 추가 방지)
   const addableItems = match.missingIngredients.filter(
     (item) => !isInShoppingList(item.ingredientId),
@@ -101,6 +104,8 @@ function RecipeDetailPage() {
   const similarRecipes = getRecommendations({
     recipes: recipes.filter((item) => item.id !== recipe.id),
     fridgeIngredients,
+    excludedIngredientIds: profileSettings.excludedIngredientIds,
+    preferredCategories: profileSettings.preferredCategories,
     limit: SIMILAR_RECIPE_COUNT,
   });
 

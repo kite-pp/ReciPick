@@ -11,7 +11,8 @@ const uniqueIngredients = (recipe) => [
 ];
 
 // 소비기한이 오늘보다 지난 재료는 보유로 치지 않는다 (오늘까지는 보유)
-const getUsableIds = (fridgeIngredients, today) =>
+// 추천·상세가 같은 기준으로 일치율을 계산하도록 내보낸다.
+export const getUsableIngredientIds = (fridgeIngredients, today = getTodayKst()) =>
   fridgeIngredients
     .filter((item) => !item.expiresAt || item.expiresAt >= today)
     .map((item) => item.ingredientId);
@@ -50,7 +51,7 @@ export function getRecommendations({
   limit = DEFAULT_LIMIT,
   today = getTodayKst(),
 }) {
-  const usableIds = getUsableIds(fridgeIngredients, today);
+  const usableIds = getUsableIngredientIds(fridgeIngredients, today);
   if (usableIds.length === 0) return []; // 빈 냉장고는 빈 배열
 
   const excluded = new Set(excludedIngredientIds);

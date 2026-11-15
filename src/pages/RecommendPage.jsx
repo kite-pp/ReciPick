@@ -5,10 +5,12 @@ import Badge from '../components/common/Badge.jsx';
 import Button from '../components/common/Button.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import { ROUTES } from '../constants/routes.js';
+import { useAuth } from '../contexts/useAuth.js';
 import { useUserData } from '../contexts/UserDataContext.jsx';
 import { COOKING_TIME_FILTERS, DIFFICULTIES, RECIPE_CATEGORIES } from '../data/constants.js';
 import { ingredients } from '../data/ingredients.js';
 import { recipes } from '../data/recipes.js';
+import { useProfileSettings } from '../hooks/useProfileSettings.js';
 import { getRecommendations } from '../utils/recommendation.js';
 import styles from './RecommendPage.module.css';
 
@@ -29,7 +31,10 @@ const FILTER_GROUPS = [
 
 function RecommendPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { fridgeIngredients } = useUserData();
+  // 마이페이지의 제외 재료(알레르기)·선호 카테고리를 추천에 반영합니다.
+  const { settings: profileSettings } = useProfileSettings(user?.id);
   const [selected, setSelected] = useState({ category: ALL, time: ALL, difficulty: ALL });
   const [applied, setApplied] = useState(null); // null이면 아직 추천받기 전
 
@@ -44,13 +49,15 @@ function RecommendPage() {
     return getRecommendations({
       recipes,
       fridgeIngredients,
+      excludedIngredientIds: profileSettings.excludedIngredientIds,
+      preferredCategories: profileSettings.preferredCategories,
       filters: {
         category: applied.category === ALL ? null : applied.category,
         difficulty: applied.difficulty === ALL ? null : applied.difficulty,
         maxMinutes: applied.time === ALL ? null : Number.parseInt(applied.time, 10),
       },
     });
-  }, [fridgeIngredients, applied]);
+  }, [fridgeIngredients, profileSettings, applied]);
   const [main, ...subs] = results.slice(0, 3);
 
   const getNames = (items) =>

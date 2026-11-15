@@ -24,9 +24,9 @@ function MyPage() {
     <>
       <MyPageSummary
         userName={userName}
-        fridgeCount={fridgeIngredients.length}
-        favoriteCount={favorites.length}
-        recentCount={recentRecipes.length}
+        fridgeIngredients={fridgeIngredients}
+        favorites={favorites}
+        recentRecipes={recentRecipes}
         shoppingCount={notBoughtCount}
       />
       <MyPageSettings />

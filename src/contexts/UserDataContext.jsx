@@ -1,12 +1,15 @@
 // src/contexts/UserDataContext.jsx
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { getUserStorageKey, STORAGE_KEYS } from '../constants/storageKeys.js';
 import { INGREDIENT_UNITS } from '../data/constants.js';
 import { useLocalStorage } from '../hooks/useLocalStorage.js';
+import { supabase } from '../utils/supabaseClient.js';
 import { useAuth } from './useAuth.js';
 
 const MAX_RECENT_RECIPES = 10;
+// 로그아웃 상태에서 보여줄 빈 목록 (매번 새 배열을 만들지 않으려고 하나만 둠)
+const EMPTY_LIST = [];
 
 const UserDataContext = createContext(null);
 
@@ -45,10 +48,48 @@ export function UserDataProvider({ children }) {
     getUserStorageKey(STORAGE_KEYS.fridgeIngredients, userId),
     [],
   );
-  const [favorites, setFavorites] = useLocalStorage(
-    getUserStorageKey(STORAGE_KEYS.favorites, userId),
-    [],
-  );
+  // 찜 목록과 "누구의 목록인지"를 같이 저장
+  const [favoriteData, setFavoriteData] = useState({ userId: null, ids: EMPTY_LIST });
+
+  // 지금 로그인한 계정의 목록일 때만 보여주기 (로그아웃·다른 계정이면 빈 목록)
+  let favorites = EMPTY_LIST;
+  if (userId && favoriteData.userId === userId) {
+    favorites = favoriteData.ids;
+  }
+
+  // 로그인하면 내 찜 목록을 Supabase에서 불러오기
+  useEffect(() => {
+    // 로그아웃 상태거나 Supabase 설정이 없으면 불러오지 않음
+    if (!userId || !supabase) return;
+
+    // 계정을 빨리 바꿨을 때, 예전 계정 결과가 늦게 와서 덮어쓰지 않게 막는 표시
+    let ignore = false;
+
+    supabase
+      .from('favorites')
+      .select('recipe_id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false }) // 최근에 찜한 게 앞
+      .then(({ data, error }) => {
+        if (ignore) return;
+        if (error) {
+          console.error('찜 목록을 불러오지 못했어요.', error);
+          return;
+        }
+
+        // [{ recipe_id: 1 }, { recipe_id: 3 }] → [1, 3]
+        const ids = [];
+        for (const row of data) {
+          ids.push(row.recipe_id);
+        }
+        setFavoriteData({ userId, ids });
+      });
+
+    // 계정이 바뀌거나 화면을 떠나면 이전 요청 결과는 무시
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
   const [storedShopping, setStoredShopping] = useLocalStorage(
     getUserStorageKey(STORAGE_KEYS.shoppingList, userId),
     [],
@@ -113,11 +154,19 @@ export function UserDataProvider({ children }) {
 
   const toggleFavorite = useCallback(
     async (recipeId) => {
-      setFavorites((ids) =>
-        ids.includes(recipeId) ? ids.filter((id) => id !== recipeId) : [recipeId, ...ids],
-      );
+      if (!userId || !supabase) return;
+
+      if (favorites.includes(recipeId)) {
+        // 이미 찜했으면 → 해제: 화면에서 먼저 빼고 DB에서 삭제
+        setFavoriteData({ userId, ids: favorites.filter((id) => id !== recipeId) });
+        await supabase.from('favorites').delete().eq('user_id', userId).eq('recipe_id', recipeId);
+      } else {
+        // 찜 안 했으면 → 추가: 화면 맨 앞에 넣고 DB에 저장
+        setFavoriteData({ userId, ids: [recipeId, ...favorites] });
+        await supabase.from('favorites').insert({ user_id: userId, recipe_id: recipeId });
+      }
     },
-    [setFavorites],
+    [favorites, userId],
   );
 
   // ---------- 장보기 ----------

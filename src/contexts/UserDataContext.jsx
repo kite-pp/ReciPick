@@ -1,12 +1,15 @@
 // src/contexts/UserDataContext.jsx
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { getUserStorageKey, STORAGE_KEYS } from '../constants/storageKeys.js';
 import { INGREDIENT_UNITS } from '../data/constants.js';
 import { useLocalStorage } from '../hooks/useLocalStorage.js';
+import { supabase } from '../utils/supabaseClient.js';
 import { useAuth } from './useAuth.js';
 
 const MAX_RECENT_RECIPES = 10;
+// 로그아웃 상태에서 보여줄 빈 목록 (매번 새 배열을 만들지 않으려고 하나만 둠)
+const EMPTY_LIST = [];
 
 const UserDataContext = createContext(null);
 
@@ -45,21 +48,136 @@ export function UserDataProvider({ children }) {
     getUserStorageKey(STORAGE_KEYS.fridgeIngredients, userId),
     [],
   );
-  const [favorites, setFavorites] = useLocalStorage(
-    getUserStorageKey(STORAGE_KEYS.favorites, userId),
-    [],
-  );
-  const [storedShopping, setStoredShopping] = useLocalStorage(
-    getUserStorageKey(STORAGE_KEYS.shoppingList, userId),
-    [],
-  );
-  const [recentRecipes, setRecentRecipes] = useLocalStorage(
-    getUserStorageKey(STORAGE_KEYS.recentRecipes, userId),
-    [],
-  );
+  // 찜 목록과 "누구의 목록인지"를 같이 저장
+  const [favoriteData, setFavoriteData] = useState({ userId: null, ids: EMPTY_LIST });
+
+  // 지금 로그인한 계정의 목록일 때만 보여주기 (로그아웃·다른 계정이면 빈 목록)
+  let favorites = EMPTY_LIST;
+  if (userId && favoriteData.userId === userId) {
+    favorites = favoriteData.ids;
+  }
+
+  // 로그인하면 내 찜 목록을 Supabase에서 불러오기
+  useEffect(() => {
+    // 로그아웃 상태거나 Supabase 설정이 없으면 불러오지 않음
+    if (!userId || !supabase) return;
+
+    // 계정을 빨리 바꿨을 때, 예전 계정 결과가 늦게 와서 덮어쓰지 않게 막는 표시
+    let ignore = false;
+
+    supabase
+      .from('favorites')
+      .select('recipe_id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false }) // 최근에 찜한 게 앞
+      .then(({ data, error }) => {
+        if (ignore) return;
+        if (error) {
+          console.error('찜 목록을 불러오지 못했어요.', error);
+          return;
+        }
+
+        // [{ recipe_id: 1 }, { recipe_id: 3 }] → [1, 3]
+        const ids = [];
+        for (const row of data) {
+          ids.push(row.recipe_id);
+        }
+        setFavoriteData({ userId, ids });
+      });
+
+    // 계정이 바뀌거나 화면을 떠나면 이전 요청 결과는 무시
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
+
+  // 장보기 목록과 "누구의 목록인지"를 같이 저장
+  // 항목 모양: { ingredientId, checked, addedAt }
+  const [shoppingData, setShoppingData] = useState({ userId: null, items: EMPTY_LIST });
+
+  // 지금 로그인한 계정의 목록일 때만 보여주기 (로그아웃·다른 계정이면 빈 목록)
+  let shoppingList = EMPTY_LIST;
+  if (userId && shoppingData.userId === userId) {
+    shoppingList = shoppingData.items;
+  }
+
+  // 로그인하면 장보기 목록을 Supabase에서 불러오기
+  useEffect(() => {
+    if (!userId || !supabase) return;
+
+    let ignore = false;
+
+    supabase
+      .from('shopping_items')
+      .select('ingredient_id, checked, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false }) // 최근에 담은 게 앞
+      .order('id', { ascending: true }) // 한 번에 담은 재료는 담은 순서대로
+      .then(({ data, error }) => {
+        if (ignore) return;
+        if (error) {
+          console.error('장보기 목록을 불러오지 못했어요.', error);
+          return;
+        }
+
+        // DB 이름(ingredient_id) → 앱 이름(ingredientId)으로 바꾸기
+        const items = [];
+        for (const row of data) {
+          items.push({
+            ingredientId: row.ingredient_id,
+            checked: row.checked,
+            addedAt: row.created_at,
+          });
+        }
+        setShoppingData({ userId, items });
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
+
+  // 최근 본 레시피 목록과 "누구의 목록인지"를 같이 저장
+  const [recentData, setRecentData] = useState({ userId: null, ids: EMPTY_LIST });
+
+  // 지금 로그인한 계정의 목록일 때만 보여주기 (로그아웃·다른 계정이면 빈 목록)
+  let recentRecipes = EMPTY_LIST;
+  if (userId && recentData.userId === userId) {
+    recentRecipes = recentData.ids;
+  }
+
+  // 로그인하면 최근 본 레시피를 Supabase에서 불러오기
+  useEffect(() => {
+    if (!userId || !supabase) return;
+
+    let ignore = false;
+
+    supabase
+      .from('recent_recipes')
+      .select('recipe_id')
+      .eq('user_id', userId)
+      .order('viewed_at', { ascending: false }) // 최근에 본 게 앞
+      .limit(MAX_RECENT_RECIPES)
+      .then(({ data, error }) => {
+        if (ignore) return;
+        if (error) {
+          console.error('최근 본 레시피를 불러오지 못했어요.', error);
+          return;
+        }
+
+        const ids = [];
+        for (const row of data) {
+          ids.push(row.recipe_id);
+        }
+        setRecentData({ userId, ids });
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
 
   const fridgeIngredients = useMemo(() => storedFridge.filter(isItemObject), [storedFridge]);
-  const shoppingList = useMemo(() => storedShopping.filter(isItemObject), [storedShopping]);
 
   // ---------- 냉장고 ----------
   const isInFridge = useCallback(
@@ -113,11 +231,19 @@ export function UserDataProvider({ children }) {
 
   const toggleFavorite = useCallback(
     async (recipeId) => {
-      setFavorites((ids) =>
-        ids.includes(recipeId) ? ids.filter((id) => id !== recipeId) : [recipeId, ...ids],
-      );
+      if (!userId || !supabase) return;
+
+      if (favorites.includes(recipeId)) {
+        // 이미 찜했으면 → 해제: 화면에서 먼저 빼고 DB에서 삭제
+        setFavoriteData({ userId, ids: favorites.filter((id) => id !== recipeId) });
+        await supabase.from('favorites').delete().eq('user_id', userId).eq('recipe_id', recipeId);
+      } else {
+        // 찜 안 했으면 → 추가: 화면 맨 앞에 넣고 DB에 저장
+        setFavoriteData({ userId, ids: [recipeId, ...favorites] });
+        await supabase.from('favorites').insert({ user_id: userId, recipe_id: recipeId });
+      }
     },
-    [setFavorites],
+    [favorites, userId],
   );
 
   // ---------- 장보기 ----------
@@ -128,17 +254,30 @@ export function UserDataProvider({ children }) {
 
   const addShoppingItems = useCallback(
     async (ingredientIds) => {
-      setStoredShopping((items) => {
-        const validItems = items.filter(isItemObject);
-        const existingIds = new Set(validItems.map((item) => item.ingredientId));
-        const addedAt = nowIso();
-        const newItems = [...new Set(ingredientIds)]
-          .filter((id) => !existingIds.has(id))
-          .map((id) => ({ ingredientId: id, checked: false, addedAt }));
-        return [...newItems, ...validItems];
-      });
+      if (!userId || !supabase) return;
+
+      // 이미 장보기에 있는 재료와, 넘어온 목록 안의 중복은 빼고 새로 담을 재료만 고르기
+      const newIds = [];
+      for (const id of ingredientIds) {
+        const alreadyInList = shoppingList.some((item) => item.ingredientId === id);
+        if (!alreadyInList && !newIds.includes(id)) {
+          newIds.push(id);
+        }
+      }
+      if (newIds.length === 0) return;
+
+      // 화면 맨 앞에 먼저 넣기
+      const addedAt = nowIso();
+      const newItems = newIds.map((id) => ({ ingredientId: id, checked: false, addedAt }));
+      setShoppingData((prev) => ({ userId, items: [...newItems, ...prev.items] }));
+
+      // DB에 저장 (혹시 이미 있으면 그대로 두기)
+      const rows = newIds.map((id) => ({ user_id: userId, ingredient_id: id, checked: false }));
+      await supabase
+        .from('shopping_items')
+        .upsert(rows, { onConflict: 'user_id,ingredient_id', ignoreDuplicates: true });
     },
-    [setStoredShopping],
+    [shoppingList, userId],
   );
 
   const addShoppingItem = useCallback(
@@ -148,39 +287,93 @@ export function UserDataProvider({ children }) {
 
   const toggleShoppingItem = useCallback(
     async (ingredientId) => {
-      setStoredShopping((items) =>
-        items
-          .filter(isItemObject)
-          .map((item) =>
-            item.ingredientId === ingredientId ? { ...item, checked: !item.checked } : item,
-          ),
-      );
+      if (!userId || !supabase) return;
+
+      const target = shoppingList.find((item) => item.ingredientId === ingredientId);
+      if (!target) return;
+      const nextChecked = !target.checked;
+
+      // 화면에서 체크 상태 먼저 바꾸기
+      setShoppingData((prev) => ({
+        userId,
+        items: prev.items.map((item) =>
+          item.ingredientId === ingredientId ? { ...item, checked: nextChecked } : item,
+        ),
+      }));
+
+      // DB에도 체크 상태 저장
+      await supabase
+        .from('shopping_items')
+        .update({ checked: nextChecked })
+        .eq('user_id', userId)
+        .eq('ingredient_id', ingredientId);
     },
-    [setStoredShopping],
+    [shoppingList, userId],
   );
 
   const removeShoppingItem = useCallback(
     async (ingredientId) => {
-      setStoredShopping((items) =>
-        items.filter(isItemObject).filter((item) => item.ingredientId !== ingredientId),
-      );
+      if (!userId || !supabase) return;
+
+      // 화면에서 먼저 빼기
+      // ("구매 완료 삭제"는 여러 개를 연달아 지우기 때문에, 이전 상태(prev)를 기준으로 빼야 다 지워짐)
+      setShoppingData((prev) => ({
+        userId,
+        items: prev.items.filter((item) => item.ingredientId !== ingredientId),
+      }));
+
+      // DB에서 삭제
+      await supabase
+        .from('shopping_items')
+        .delete()
+        .eq('user_id', userId)
+        .eq('ingredient_id', ingredientId);
     },
-    [setStoredShopping],
+    [userId],
   );
 
   // ---------- 최근 본 레시피 ----------
   const addRecentlyViewed = useCallback(
     async (recipeId) => {
-      setRecentRecipes((ids) =>
-        [recipeId, ...ids.filter((id) => id !== recipeId)].slice(0, MAX_RECENT_RECIPES),
-      );
+      if (!userId || !supabase) return;
+
+      // 이미 맨 앞에 있으면 할 일이 없음
+      // (상세 화면이 이 함수가 바뀔 때마다 다시 부르기 때문에, 여기서 멈춰야 무한 반복이 안 됨)
+      if (recentRecipes[0] === recipeId) return;
+
+      // 맨 앞에 넣고, 같은 레시피는 빼고, 최대 10개까지만
+      const otherIds = recentRecipes.filter((id) => id !== recipeId);
+      const nextIds = [recipeId, ...otherIds].slice(0, MAX_RECENT_RECIPES);
+      setRecentData({ userId, ids: nextIds });
+
+      // DB에 저장 (이미 본 레시피면 본 시간만 지금으로 바꿈)
+      await supabase
+        .from('recent_recipes')
+        .upsert(
+          { user_id: userId, recipe_id: recipeId, viewed_at: new Date().toISOString() },
+          { onConflict: 'user_id,recipe_id' },
+        );
+
+      // 10개를 넘어서 밀려난 레시피는 DB에서도 지우기
+      const removedIds = otherIds.filter((id) => !nextIds.includes(id));
+      if (removedIds.length > 0) {
+        await supabase
+          .from('recent_recipes')
+          .delete()
+          .eq('user_id', userId)
+          .in('recipe_id', removedIds);
+      }
     },
-    [setRecentRecipes],
+    [recentRecipes, userId],
   );
 
   const clearRecentlyViewed = useCallback(async () => {
-    setRecentRecipes([]);
-  }, [setRecentRecipes]);
+    if (!userId || !supabase) return;
+
+    // 화면에서 먼저 비우고, 내 기록을 DB에서 모두 지우기
+    setRecentData({ userId, ids: EMPTY_LIST });
+    await supabase.from('recent_recipes').delete().eq('user_id', userId);
+  }, [userId]);
 
   const value = useMemo(
     () => ({

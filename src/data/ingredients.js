@@ -1,5 +1,3 @@
-const INGREDIENT_PLACEHOLDER_IMAGE = '/images/ingredients/placeholder.svg';
-
 export const ingredients = [
   { id: 1, name: '밥', category: '곡류', image: '/images/ingredients/1.png' },
   { id: 2, name: '김치', category: '채소', image: '/images/ingredients/2.png' },

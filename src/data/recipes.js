@@ -1,5 +1,3 @@
-const RECIPE_PLACEHOLDER_IMAGE = '/images/recipes/placeholder.svg';
-
 export const recipes = [
   {
     id: 1,

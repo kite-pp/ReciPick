@@ -94,10 +94,45 @@ export function UserDataProvider({ children }) {
     getUserStorageKey(STORAGE_KEYS.shoppingList, userId),
     [],
   );
-  const [recentRecipes, setRecentRecipes] = useLocalStorage(
-    getUserStorageKey(STORAGE_KEYS.recentRecipes, userId),
-    [],
-  );
+  // 최근 본 레시피 목록과 "누구의 목록인지"를 같이 저장
+  const [recentData, setRecentData] = useState({ userId: null, ids: EMPTY_LIST });
+
+  // 지금 로그인한 계정의 목록일 때만 보여주기 (로그아웃·다른 계정이면 빈 목록)
+  let recentRecipes = EMPTY_LIST;
+  if (userId && recentData.userId === userId) {
+    recentRecipes = recentData.ids;
+  }
+
+  // 로그인하면 최근 본 레시피를 Supabase에서 불러오기
+  useEffect(() => {
+    if (!userId || !supabase) return;
+
+    let ignore = false;
+
+    supabase
+      .from('recent_recipes')
+      .select('recipe_id')
+      .eq('user_id', userId)
+      .order('viewed_at', { ascending: false }) // 최근에 본 게 앞
+      .limit(MAX_RECENT_RECIPES)
+      .then(({ data, error }) => {
+        if (ignore) return;
+        if (error) {
+          console.error('최근 본 레시피를 불러오지 못했어요.', error);
+          return;
+        }
+
+        const ids = [];
+        for (const row of data) {
+          ids.push(row.recipe_id);
+        }
+        setRecentData({ userId, ids });
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
 
   const fridgeIngredients = useMemo(() => storedFridge.filter(isItemObject), [storedFridge]);
   const shoppingList = useMemo(() => storedShopping.filter(isItemObject), [storedShopping]);
@@ -220,16 +255,45 @@ export function UserDataProvider({ children }) {
   // ---------- 최근 본 레시피 ----------
   const addRecentlyViewed = useCallback(
     async (recipeId) => {
-      setRecentRecipes((ids) =>
-        [recipeId, ...ids.filter((id) => id !== recipeId)].slice(0, MAX_RECENT_RECIPES),
-      );
+      if (!userId || !supabase) return;
+
+      // 이미 맨 앞에 있으면 할 일이 없음
+      // (상세 화면이 이 함수가 바뀔 때마다 다시 부르기 때문에, 여기서 멈춰야 무한 반복이 안 됨)
+      if (recentRecipes[0] === recipeId) return;
+
+      // 맨 앞에 넣고, 같은 레시피는 빼고, 최대 10개까지만
+      const otherIds = recentRecipes.filter((id) => id !== recipeId);
+      const nextIds = [recipeId, ...otherIds].slice(0, MAX_RECENT_RECIPES);
+      setRecentData({ userId, ids: nextIds });
+
+      // DB에 저장 (이미 본 레시피면 본 시간만 지금으로 바꿈)
+      await supabase
+        .from('recent_recipes')
+        .upsert(
+          { user_id: userId, recipe_id: recipeId, viewed_at: new Date().toISOString() },
+          { onConflict: 'user_id,recipe_id' },
+        );
+
+      // 10개를 넘어서 밀려난 레시피는 DB에서도 지우기
+      const removedIds = otherIds.filter((id) => !nextIds.includes(id));
+      if (removedIds.length > 0) {
+        await supabase
+          .from('recent_recipes')
+          .delete()
+          .eq('user_id', userId)
+          .in('recipe_id', removedIds);
+      }
     },
-    [setRecentRecipes],
+    [recentRecipes, userId],
   );
 
   const clearRecentlyViewed = useCallback(async () => {
-    setRecentRecipes([]);
-  }, [setRecentRecipes]);
+    if (!userId || !supabase) return;
+
+    // 화면에서 먼저 비우고, 내 기록을 DB에서 모두 지우기
+    setRecentData({ userId, ids: EMPTY_LIST });
+    await supabase.from('recent_recipes').delete().eq('user_id', userId);
+  }, [userId]);
 
   const value = useMemo(
     () => ({

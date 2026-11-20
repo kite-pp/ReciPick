@@ -47,6 +47,11 @@
   cursor: pointer;
 }
 
+.header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .headerActions {
   display: flex;
   flex-wrap: wrap;

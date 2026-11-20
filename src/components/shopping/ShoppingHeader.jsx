@@ -1,6 +1,6 @@
 import styles from './ShoppingListPage.module.css';
 
-function ShoppingHeader({ onRemoveChecked, onMoveToFridge }) {
+function ShoppingHeader({ onRemoveChecked, onMoveToFridge, isMoving }) {
   return (
     <div className={styles.header}>
       <div>
@@ -10,8 +10,8 @@ function ShoppingHeader({ onRemoveChecked, onMoveToFridge }) {
       </div>
 
       <div className={styles.headerActions}>
-        <button type="button" onClick={onMoveToFridge}>
-          냉장고에 넣기
+        <button type="button" onClick={onMoveToFridge} disabled={isMoving}>
+          {isMoving ? '넣는 중...' : '냉장고에 넣기'}
         </button>
         <button type="button" onClick={onRemoveChecked}>
           구매 완료 삭제

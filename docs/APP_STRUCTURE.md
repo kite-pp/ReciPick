@@ -47,7 +47,7 @@ main.jsx → App.jsx → pages → components
 1. 화면 한 곳에서만 쓰는 값은 지역 State를 사용합니다.
 2. 여러 컴포넌트가 같은 로직을 반복하면 Custom Hook으로 분리합니다.
 3. 서로 다른 라우트가 같은 값을 읽고 수정하면 Context API를 사용합니다.
-4. 새로고침 후 유지할 값은 `useLocalStorage`와 `STORAGE_KEYS`를 사용합니다.
+4. 로그인 사용자의 데이터는 `UserDataContext`·`useProfileSettings`를 통해 Supabase에 저장합니다.
 
 Context를 추가하기 전에 Props 전달로 충분한지 먼저 확인합니다.
 

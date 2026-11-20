@@ -7,7 +7,7 @@ import styles from '../components/shopping/ShoppingListPage.module.css';
 import { useUserData } from '../contexts/UserDataContext.jsx';
 
 function ShoppingListPage() {
-  const { shoppingList, removeShoppingItem } = useUserData();
+  const { shoppingList, removeShoppingItem, isInFridge, addFridgeIngredient } = useUserData();
 
   // 체크한 항목 개수 세기
   let checkedCount = 0;
@@ -32,9 +32,33 @@ function ShoppingListPage() {
     }
   };
 
+  // 구매 완료한 재료를 냉장고에 넣고 장보기에서 빼기
+  const handleMoveToFridge = async () => {
+    if (checkedCount === 0) {
+      alert('구매 완료한 재료가 없습니다.');
+      return;
+    }
+
+    if (!confirm('구매 완료한 재료를 냉장고에 넣을까요?')) return;
+
+    let addedCount = 0;
+    for (const item of shoppingList) {
+      if (!item.checked) continue;
+
+      // 냉장고에 없는 재료만 1개로 넣기 (이미 있으면 장보기에서만 빼기)
+      if (!isInFridge(item.ingredientId)) {
+        await addFridgeIngredient({ ingredientId: item.ingredientId, quantity: 1, unit: '개' });
+        addedCount = addedCount + 1;
+      }
+      await removeShoppingItem(item.ingredientId);
+    }
+
+    alert(`냉장고에 재료 ${addedCount}개를 넣었어요.`);
+  };
+
   return (
     <div className={styles.page}>
-      <ShoppingHeader onRemoveChecked={handleRemoveChecked} />
+      <ShoppingHeader onRemoveChecked={handleRemoveChecked} onMoveToFridge={handleMoveToFridge} />
 
       <ShoppingSummary totalCount={shoppingList.length} checkedCount={checkedCount} />
 

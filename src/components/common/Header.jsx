@@ -1,19 +1,22 @@
-import { useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import bellIcon from '../../assets/common/bell.svg';
 import brandLogo from '../../assets/common/brand-logo.png';
 import profileAvatar from '../../assets/common/profile-avatar.png';
 import searchIcon from '../../assets/common/search.svg';
-import { PRIMARY_NAVIGATION_ITEMS, ROUTES } from '../../constants/routes.js';
+import {
+  MOBILE_NAVIGATION_ITEMS,
+  PRIMARY_NAVIGATION_ITEMS,
+  ROUTES,
+} from '../../constants/routes.js';
 import { useAuth } from '../../contexts/useAuth.js';
+import { useUserData } from '../../contexts/UserDataContext.jsx';
 import styles from './Layout.module.css';
 
 function Header() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoggedIn, isLoading, logout } = useAuth();
+  const { shoppingList } = useUserData();
 
   // 헤더에 보여줄 이름 (닉네임 없으면 이메일 앞부분)
   let userName = '';
@@ -23,6 +26,13 @@ function Header() {
     } else {
       userName = user.email.split('@')[0];
     }
+  }
+
+  // 장바구니(장보기) 배지: 아직 안 산 재료 개수 (10개 넘으면 9+)
+  const notBoughtCount = shoppingList.filter((item) => !item.checked).length;
+  let cartBadgeText = String(notBoughtCount);
+  if (notBoughtCount > 9) {
+    cartBadgeText = '9+';
   }
 
   // 로그인 후에 지금 보던 페이지로 돌아오도록 현재 주소를 같이 넘김
@@ -40,40 +50,14 @@ function Header() {
     }
   };
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-
-    const query = searchTerm.trim();
-    const search = query ? `?search=${encodeURIComponent(query)}` : '';
-    navigate(`${ROUTES.recipes}${search}`);
-  };
-
   return (
     <>
       <header className={styles['site-header']}>
         <div className={styles['site-header__inner']}>
-          <div className={styles['site-header__start']}>
-            <Link className={styles.brand} to={ROUTES.home} aria-label="ReciPick 홈">
-              <img className={styles['brand__logo']} src={brandLogo} alt="" />
-              <span className={styles['brand__name']}>ReciPick</span>
-            </Link>
-
-            <form className={styles['header-search']} role="search" onSubmit={handleSearch}>
-              <label className={styles['sr-only']} htmlFor="recipe-search">
-                레시피 검색
-              </label>
-              <input
-                id="recipe-search"
-                type="search"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="레시피를 검색해 보세요"
-              />
-              <button type="submit" aria-label="레시피 검색">
-                <img src={searchIcon} alt="" />
-              </button>
-            </form>
-          </div>
+          <Link className={styles.brand} to={ROUTES.home} aria-label="ReciPick 홈">
+            <img className={styles['brand__logo']} src={brandLogo} alt="" />
+            <span className={styles['brand__name']}>ReciPick</span>
+          </Link>
 
           <nav className={styles['primary-nav']} aria-label="주요 메뉴">
             {PRIMARY_NAVIGATION_ITEMS.map((item) => (
@@ -92,6 +76,12 @@ function Header() {
           </nav>
 
           <div className={styles['site-header__actions']}>
+            {/* 검색: Figma처럼 버튼만 두고 레시피 탐색 화면의 검색창으로 이동 */}
+            <Link className={styles['search-link']} to={ROUTES.recipes}>
+              <img src={searchIcon} alt="" />
+              <span className={styles['search-link__text']}>검색</span>
+            </Link>
+
             {/* 로그인 상태 확인 중 */}
             {isLoading && <div className={styles['auth-placeholder']} aria-hidden="true"></div>}
 
@@ -105,20 +95,25 @@ function Header() {
             {/* 로그인 했을 때 */}
             {!isLoading && isLoggedIn && (
               <>
-                <button
-                  className={styles['notification-button']}
-                  type="button"
-                  aria-label="알림 확인"
-                >
+                <button className={styles['icon-button']} type="button" aria-label="알림 확인">
                   <img src={bellIcon} alt="" />
-                  <span className={styles['notification-button__dot']} aria-hidden="true" />
+                  <span className={styles['icon-button__dot']} aria-hidden="true" />
                 </button>
+                <Link
+                  className={styles['icon-button']}
+                  to={ROUTES.shoppingList}
+                  aria-label={'장보기 목록 (구매 전 ' + notBoughtCount + '개)'}
+                >
+                  <span aria-hidden="true">🛒</span>
+                  {notBoughtCount > 0 && (
+                    <span className={styles['icon-button__badge']} aria-hidden="true">
+                      {cartBadgeText}
+                    </span>
+                  )}
+                </Link>
                 <Link className={styles.profile} to={ROUTES.myPage} aria-label="마이페이지">
                   <img className={styles['profile__avatar']} src={profileAvatar} alt="" />
-                  <div className={styles['profile__copy']}>
-                    <strong>{userName}</strong>
-                    <span>오늘도 맛있는 한 끼</span>
-                  </div>
+                  <span className={styles['profile__name']}>{userName}님</span>
                 </Link>
                 <button className={styles['logout-button']} type="button" onClick={handleLogout}>
                   로그아웃
@@ -130,7 +125,7 @@ function Header() {
       </header>
 
       <nav className={styles['mobile-nav']} aria-label="모바일 주요 메뉴">
-        {PRIMARY_NAVIGATION_ITEMS.map((item) => (
+        {MOBILE_NAVIGATION_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

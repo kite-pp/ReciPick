@@ -1,7 +1,7 @@
 export const getExpiryInfo = (expiresAt) => {
   if (!expiresAt) {
     return {
-      label: '정보 없음',
+      label: '소비 기한 없음.',
       status: 'unknown',
     };
   }
@@ -23,7 +23,7 @@ export const getExpiryInfo = (expiresAt) => {
 
   if (remainingDays < 0) {
     return {
-      label: '기한지남',
+      label: '만료',
       status: 'expired',
     };
   }
@@ -35,15 +35,16 @@ export const getExpiryInfo = (expiresAt) => {
     };
   }
 
-  if (remainingDays <= 3) {
+  // Figma 기준 : 7일 이하 남으면 임박
+  if (remainingDays <= 7) {
     return {
-      label: `임박  D-${remainingDays}`,
+      label: `임박 · D-${remainingDays}`,
       status: 'soon',
     };
   }
 
   return {
-    label: `신선  D-${remainingDays}`,
+    label: `신선 · D-${remainingDays}`,
     status: 'fresh',
   };
 };

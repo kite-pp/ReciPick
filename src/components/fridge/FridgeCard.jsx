@@ -34,6 +34,11 @@ function FridgeModal({ ingredient, onClick }) {
   };
 
   const handleDecrease = () => {
+    // 0개 밑으로는 못 내려가게
+    if (quantity <= 0) {
+      return;
+    }
+
     updateFridgeIngredient(id, {
       quantity: quantity - 1,
     });
@@ -83,7 +88,10 @@ function FridgeModal({ ingredient, onClick }) {
           >
             -
           </button>
-          <strong>{fridgeItem?.quantity ?? 0}개</strong>
+          <strong>
+            {fridgeItem?.quantity ?? 0}
+            {fridgeItem?.unit ?? '개'}
+          </strong>
           <button
             type="button"
             onClick={(event) => {

@@ -17,13 +17,13 @@ function Footer() {
             <img className={styles['brand__logo']} src={brandLogo} alt="" />
             <span className={styles['brand__name']}>ReciPick</span>
           </Link>
-          <p>냉장고 속 재료로 시작하는 즐거운 요리</p>
+          <p>냉장고 속 재료로 더 쉬운 한 끼</p>
         </div>
 
         <nav className={styles['footer-nav']} aria-label="서비스 안내">
-          <span title="준비 중인 메뉴입니다">이용약관</span>
-          <span title="준비 중인 메뉴입니다">개인정보처리방침</span>
-          <a href="mailto:support@recipick.app">고객지원</a>
+          <span title="준비 중인 메뉴입니다">서비스 이용약관</span>
+          <span title="준비 중인 메뉴입니다">개인정보 처리방침</span>
+          <a href="mailto:support@recipick.app">고객센터</a>
         </nav>
       </div>
       <p className={styles['site-footer__copyright']}>

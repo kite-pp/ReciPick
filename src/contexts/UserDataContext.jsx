@@ -12,6 +12,8 @@ const EMPTY_LIST = [];
 const UserDataContext = createContext(null);
 
 const nowIso = () => new Date().toISOString();
+// 저장해 둔 목록이 지금 계정 것이면 그 목록을, 아니면(계정이 바뀐 직후) 빈 목록을 돌려준다
+const itemsOf = (data, userId) => (data.userId === userId ? data.items : EMPTY_LIST);
 const pickDefined = (fields) =>
   Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined));
 
@@ -78,8 +80,9 @@ export function UserDataProvider({ children }) {
         if (ignore) return;
         if (error) {
           console.error('냉장고 재료를 불러오지 못했어요.', error);
-          // 실패해도 빈 목록으로 로딩은 끝내기
-          setFridgeData({ userId, items: EMPTY_LIST });
+          // 처음 불러오기가 실패하면 빈 목록으로 로딩을 끝내고,
+          // 이미 불러온 목록이 있으면(저장 실패 뒤 다시 불러오는 경우) 그대로 둔다
+          setFridgeData((prev) => (prev.userId === userId ? prev : { userId, items: EMPTY_LIST }));
           return;
         }
 
@@ -129,8 +132,9 @@ export function UserDataProvider({ children }) {
         if (ignore) return;
         if (error) {
           console.error('찜 목록을 불러오지 못했어요.', error);
-          // 실패해도 빈 목록으로 로딩은 끝내기
-          setFavoriteData({ userId, ids: EMPTY_LIST });
+          // 처음 불러오기가 실패하면 빈 목록으로 로딩을 끝내고,
+          // 이미 불러온 목록이 있으면(저장 실패 뒤 다시 불러오는 경우) 그대로 둔다
+          setFavoriteData((prev) => (prev.userId === userId ? prev : { userId, ids: EMPTY_LIST }));
           return;
         }
 
@@ -174,8 +178,11 @@ export function UserDataProvider({ children }) {
         if (ignore) return;
         if (error) {
           console.error('장보기 목록을 불러오지 못했어요.', error);
-          // 실패해도 빈 목록으로 로딩은 끝내기
-          setShoppingData({ userId, items: EMPTY_LIST });
+          // 처음 불러오기가 실패하면 빈 목록으로 로딩을 끝내고,
+          // 이미 불러온 목록이 있으면(저장 실패 뒤 다시 불러오는 경우) 그대로 둔다
+          setShoppingData((prev) =>
+            prev.userId === userId ? prev : { userId, items: EMPTY_LIST },
+          );
           return;
         }
 
@@ -221,8 +228,9 @@ export function UserDataProvider({ children }) {
         if (ignore) return;
         if (error) {
           console.error('최근 본 레시피를 불러오지 못했어요.', error);
-          // 실패해도 빈 목록으로 로딩은 끝내기
-          setRecentData({ userId, ids: EMPTY_LIST });
+          // 처음 불러오기가 실패하면 빈 목록으로 로딩을 끝내고,
+          // 이미 불러온 목록이 있으면(저장 실패 뒤 다시 불러오는 경우) 그대로 둔다
+          setRecentData((prev) => (prev.userId === userId ? prev : { userId, ids: EMPTY_LIST }));
           return;
         }
 
@@ -254,7 +262,7 @@ export function UserDataProvider({ children }) {
 
       // 화면 맨 앞에 먼저 넣기
       const newItem = { ingredientId, quantity, unit, expiresAt, addedAt: nowIso() };
-      setFridgeData((prev) => ({ userId, items: [newItem, ...prev.items] }));
+      setFridgeData((prev) => ({ userId, items: [newItem, ...itemsOf(prev, userId)] }));
 
       // DB에 저장
       const { error } = await supabase.from('fridge_items').insert({
@@ -283,7 +291,7 @@ export function UserDataProvider({ children }) {
       // 화면에서 먼저 바꾸기
       setFridgeData((prev) => ({
         userId,
-        items: prev.items.map((item) =>
+        items: itemsOf(prev, userId).map((item) =>
           item.ingredientId === ingredientId ? { ...item, ...changes } : item,
         ),
       }));
@@ -307,7 +315,7 @@ export function UserDataProvider({ children }) {
       // 화면에서 먼저 빼기
       setFridgeData((prev) => ({
         userId,
-        items: prev.items.filter((item) => item.ingredientId !== ingredientId),
+        items: itemsOf(prev, userId).filter((item) => item.ingredientId !== ingredientId),
       }));
 
       // DB에서 삭제
@@ -372,7 +380,7 @@ export function UserDataProvider({ children }) {
       // 화면 맨 앞에 먼저 넣기
       const addedAt = nowIso();
       const newItems = newIds.map((id) => ({ ingredientId: id, checked: false, addedAt }));
-      setShoppingData((prev) => ({ userId, items: [...newItems, ...prev.items] }));
+      setShoppingData((prev) => ({ userId, items: [...newItems, ...itemsOf(prev, userId)] }));
 
       // DB에 저장 (혹시 이미 있으면 그대로 두기)
       const rows = newIds.map((id) => ({ user_id: userId, ingredient_id: id, checked: false }));
@@ -400,7 +408,7 @@ export function UserDataProvider({ children }) {
       // 화면에서 체크 상태 먼저 바꾸기
       setShoppingData((prev) => ({
         userId,
-        items: prev.items.map((item) =>
+        items: itemsOf(prev, userId).map((item) =>
           item.ingredientId === ingredientId ? { ...item, checked: nextChecked } : item,
         ),
       }));
@@ -424,7 +432,7 @@ export function UserDataProvider({ children }) {
       // ("구매 완료 삭제"는 여러 개를 연달아 지우기 때문에, 이전 상태(prev)를 기준으로 빼야 다 지워짐)
       setShoppingData((prev) => ({
         userId,
-        items: prev.items.filter((item) => item.ingredientId !== ingredientId),
+        items: itemsOf(prev, userId).filter((item) => item.ingredientId !== ingredientId),
       }));
 
       // DB에서 삭제

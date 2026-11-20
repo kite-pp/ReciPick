@@ -124,12 +124,13 @@ export const recipes = [
 - `ingredients`는 `{ name, amount }` 객체 배열입니다.
 - 필드를 추가하거나 타입을 변경하면 관련 문서와 사용처를 함께 갱신합니다.
 
-## 7. localStorage
+## 7. 사용자 데이터 저장 (Supabase)
 
-- Key는 `src/constants/storageKeys.js`에서 관리합니다.
-- `recipick.` prefix를 사용합니다.
-- 읽기/쓰기 로직은 `src/hooks/useLocalStorage.js`를 재사용합니다.
-- 저장 실패 시 화면 전체가 중단되지 않도록 예외를 처리합니다.
+- 냉장고·찜·장보기·최근 본 레시피는 `UserDataContext`가 Supabase 테이블(`fridge_items`, `favorites`, `shopping_items`, `recent_recipes`)에 저장합니다.
+- 마이페이지 설정(음식 취향·제외 재료·알림)은 `useProfileSettings`가 `profiles` 테이블에 저장합니다.
+- 화면에서는 Supabase를 직접 호출하지 않고 Context·Hook의 함수를 사용합니다.
+- DB 컬럼은 snake_case(`ingredient_id`), 앱 값은 camelCase(`ingredientId`)로 변환해 사용합니다.
+- 저장 실패 시 화면 전체가 중단되지 않도록 오류를 알리고 DB 값으로 되돌립니다.
 
 ## 8. CSS와 UI
 
@@ -179,6 +180,6 @@ pnpm build
 - 관련 라우트와 빈 데이터 상태를 직접 확인합니다.
 - 새로고침 후 유지가 필요한 값은 정상 복원됩니다.
 - 다른 화면과 공통 레이아웃이 깨지지 않습니다.
-- Mock Data 및 localStorage 스키마를 준수합니다.
+- Mock Data 및 Supabase 테이블 스키마(`supabase/schema.sql`)를 준수합니다.
 - 문서와 실제 코드가 함께 갱신됩니다.
 - PR 본문에 검증 결과와 `Close #이슈번호`를 남깁니다.

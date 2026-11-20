@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 
 import RecipeCard from '../components/common/RecipeCard.jsx';
 import { ROUTES } from '../constants/routes.js';
+import { ingredients } from '../data/ingredients.js';
 import { recipes } from '../data/recipes.js';
 import styles from './HomePage.module.css';
 import { useUserData } from '../contexts/UserDataContext.jsx';
 import { useRequireLogin } from '../hooks/useRequireLogin.js';
+import { getRecommendations } from '../utils/recommendation.js';
 
 // 바로가기 카드 3개 내용
 const QUICK_LINKS = [
@@ -22,10 +24,28 @@ const QUICK_LINKS = [
   },
 ];
 
+// 재료 id로 이름 찾기용
+const ingredientMap = new Map(ingredients.map((item) => [item.id, item]));
+
 function HomePage() {
-  // TODO: 추천 계산 함수(#41)가 나오면 일치율 높은 순으로 바꾸기. 지금은 앞에서 3개
-  const todayRecipes = recipes.slice(0, 3);
-  const { isFavorite, toggleFavorite } = useUserData();
+  const { fridgeIngredients, isFavorite, toggleFavorite } = useUserData();
+
+  // 오늘의 추천: 냉장고 재료와 일치율 높은 3개
+  // 냉장고가 비어 있으면(비로그인 포함) 빈 배열이 와서 앞에서 3개만 배지 없이 보여줌
+  const recommended = getRecommendations({ recipes, fridgeIngredients, limit: 3 });
+  let todayCards;
+  if (recommended.length > 0) {
+    todayCards = recommended.map((item) => ({
+      recipe: item.recipe,
+      matchRate: item.matchRate,
+      missingIngredients: item.missingIngredients.map(
+        (missing) => ingredientMap.get(missing.ingredientId)?.name,
+      ),
+    }));
+  } else {
+    todayCards = recipes.slice(0, 3).map((recipe) => ({ recipe }));
+  }
+
   const requireLogin = useRequireLogin();
 
   const handleFavoriteClick = (recipeId) => {
@@ -80,12 +100,14 @@ function HomePage() {
           <p className={styles.sectionText}>지금 냉장고 재료와 잘 맞는 메뉴예요.</p>
         </div>
         <div className={styles.recipeGrid}>
-          {todayRecipes.map((recipe) => (
+          {todayCards.map((card) => (
             <RecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              isFavorite={isFavorite(recipe.id)}
-              onFavoriteClick={() => handleFavoriteClick(recipe.id)}
+              key={card.recipe.id}
+              recipe={card.recipe}
+              matchRate={card.matchRate}
+              missingIngredients={card.missingIngredients}
+              isFavorite={isFavorite(card.recipe.id)}
+              onFavoriteClick={() => handleFavoriteClick(card.recipe.id)}
             />
           ))}
         </div>

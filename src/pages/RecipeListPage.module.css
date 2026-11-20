@@ -194,3 +194,198 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 카테고리 줄 + 필터 초기화 버튼 */
+.categoryRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.resetButton {
+  flex: none;
+  padding: 8px 4px;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-disabled);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.resetButton:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+/* 내 재료 우선 매칭 토글 */
+.matchToggle {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background-color: rgb(255 255 255 / 60%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+}
+
+.matchText {
+  display: flex;
+  flex-direction: column;
+}
+
+.matchTitle {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.matchDescription {
+  color: var(--color-success);
+  font-size: 11px;
+}
+
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--color-disabled);
+  cursor: pointer;
+}
+
+.switchOn {
+  background-color: var(--color-primary);
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switchKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+  transition: transform 160ms ease;
+}
+
+.switchOn .switchKnob {
+  transform: translateX(20px);
+}
+
+/* 레시피 더보기 버튼 */
+.loadMoreButton {
+  align-self: center;
+  padding: 12px 40px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background-color: rgb(255 255 255 / 80%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 검색 결과 없음: 추천 검색어 칩 */
+.suggestionList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.suggestionChip {
+  padding: 8px 15px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background-color: var(--color-white);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.suggestionChip:hover {
+  border-color: var(--color-primary);
+}
+
+/* 검색 결과 없음: 이런 레시피는 어떠세요? */
+.suggestSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.suggestTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* 하단 내 냉장고 속 식재료 */
+.fridgeDock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 512px);
+  margin: 0 auto;
+  padding: 12px 16px;
+  border-radius: 28px;
+  background-color: rgb(255 255 255 / 90%);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 8%);
+}
+
+.fridgeIcon {
+  display: grid;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff3c4;
+  place-items: center;
+}
+
+.fridgeText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fridgeTitle {
+  font-size: var(--font-size-sm);
+}
+
+.fridgeNames {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fridgeLink {
+  flex: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-soft);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .matchToggle {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}

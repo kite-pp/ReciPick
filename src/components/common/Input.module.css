@@ -5,8 +5,8 @@
 }
 
 .label {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .input {
@@ -15,8 +15,8 @@
   padding: 0 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-white);
-  font-size: var(--font-size-ㅡㅇ);
+  background-color: var(--color-primary-soft);
+  font-size: var(--font-size-md);
 }
 
 .input::placeholder {
@@ -25,6 +25,7 @@
 
 .input:focus {
   border-color: var(--color-primary);
+  background-color: var(--color-white);
   outline: none;
 }
 

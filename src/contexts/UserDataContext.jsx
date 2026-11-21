@@ -272,6 +272,15 @@ export function UserDataProvider({ children }) {
         unit,
         expires_at: expiresAt,
       });
+
+      if (error) {
+        // 저장에 실패하면 화면에 먼저 넣었던 재료를 바로 빼기
+        // (남겨 두면 다시 시도할 때 "이미 냉장고에 있음"으로 보여 저장을 건너뛰게 됨)
+        setFridgeData((prev) => ({
+          userId,
+          items: itemsOf(prev, userId).filter((item) => item !== newItem),
+        }));
+      }
       handleSaveError(error);
 
       // 저장에 성공하면 true, 실패하면 false (장보기에서 옮길 때 성공한 것만 지우려고)

@@ -93,6 +93,14 @@ function RecipeDetailPage() {
   );
 
   const status = getStatus(match.matchRate);
+
+  // 마이페이지에서 제외한 재료 중 이 레시피에 들어 있는 재료 이름 모으기
+  const excludedNames = [];
+  for (const item of recipe.ingredients) {
+    if (profileSettings.excludedIngredientIds.includes(item.ingredientId)) {
+      excludedNames.push(getName(item));
+    }
+  }
   const expiresMap = new Map(fridgeIngredients.map((item) => [item.ingredientId, item.expiresAt]));
 
   const handleAddOne = async (ingredientId) => {
@@ -144,6 +152,11 @@ function RecipeDetailPage() {
           <Badge>{recipe.category}</Badge>
           <h1 className={styles.title}>{recipe.title}</h1>
           <p className={styles.description}>{recipe.description}</p>
+          {excludedNames.length > 0 && (
+            <p className={styles.excludedWarning} role="alert">
+              ⚠️ 제외한 재료가 들어 있어요: {excludedNames.join(', ')}
+            </p>
+          )}
 
           <dl className={styles.stats}>
             <div className={styles.stat}>

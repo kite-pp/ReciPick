@@ -1,3 +1,4 @@
+import fridgeIcon from '../../assets/common/fridge.svg';
 import styles from './FridgeHeader.module.css';
 
 // <FridgeHeader totalCount={12} freshCount={5} soonCount={4} onAdd={() => {}} />
@@ -8,7 +9,9 @@ function FridgeHeader({ totalCount, freshCount, soonCount, onAdd }) {
         <span className={styles.badge}>● 실시간 스마트 냉장고 모니터링</span>
 
         <div className={styles.titleRow}>
-          <div className={styles.icon}></div>
+          <div className={styles.icon}>
+            <img src={fridgeIcon} alt="" />
+          </div>
           <h1>내 냉장고 관리</h1>
         </div>
 

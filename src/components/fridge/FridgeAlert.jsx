@@ -41,10 +41,12 @@ function FridgeAlert({ onPermissionChange }) {
   return (
     <section className={styles.alert} aria-label="소비기한 알림 안내">
       {/* 종 아이콘 SVG (aria-hidden="true") */}
-      <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      <svg className={styles.icon} viewBox="0 -960 960 960" aria-hidden="true">
+        {/* 헤더 종과 같은 Material Symbols 아이콘. 색은 CSS(color)를 따라감 */}
+        <path
+          fill="currentColor"
+          d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z"
+        />
       </svg>
       <div className={styles.text}>
         <strong>소비기한 알림을 받아보세요</strong>

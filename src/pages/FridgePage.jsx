@@ -30,8 +30,7 @@ function FridgePage() {
   const [sortType, setSortType] = useState('최근 추가순');
 
   // 알림 권한 (배너에서 허용 누르면 바뀜 → 바로 알림 확인)
-  const [notificationPermission, setNotificationPermission] =
-    useState(getNotificationPermission);
+  const [notificationPermission, setNotificationPermission] = useState(getNotificationPermission);
 
   // 1. 냉장고 항목에 재료 정보(이름, 카테고리, 이미지) 붙이기
   /* 형식 :

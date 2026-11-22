@@ -47,6 +47,17 @@
   cursor: pointer;
 }
 
+.header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

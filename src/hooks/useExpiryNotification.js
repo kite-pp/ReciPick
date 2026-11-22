@@ -68,8 +68,7 @@ export function useExpiryNotification(fridgeList, permission) {
         for (const target of targets) {
           const isNew = data.some(
             (row) =>
-              row.fridge_item_id === target.fridgeItemId &&
-              row.notification_type === target.type,
+              row.fridge_item_id === target.fridgeItemId && row.notification_type === target.type,
           );
           if (isNew) {
             newTargets.push(target);

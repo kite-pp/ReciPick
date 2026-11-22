@@ -1,6 +1,7 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import bellIcon from '../../assets/common/bell.svg';
+import cartIcon from '../../assets/common/cart.svg';
 import brandLogo from '../../assets/common/brand-logo.png';
 import profileAvatar from '../../assets/common/default-avatar.svg';
 import searchIcon from '../../assets/common/search.svg';
@@ -104,7 +105,7 @@ function Header() {
                   to={ROUTES.shoppingList}
                   aria-label={'장보기 목록 (구매 전 ' + notBoughtCount + '개)'}
                 >
-                  <span aria-hidden="true">🛒</span>
+                  <img src={cartIcon} alt="" />
                   {notBoughtCount > 0 && (
                     <span className={styles['icon-button__badge']} aria-hidden="true">
                       {cartBadgeText}

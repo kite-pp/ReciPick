@@ -55,7 +55,8 @@ export function UserDataProvider({ children }) {
   }, []);
 
   // 냉장고 재료 목록과 "누구의 목록인지"를 같이 저장
-  // 항목 모양: { ingredientId, quantity, unit, expiresAt, addedAt }
+  // 항목 모양: { id, ingredientId, quantity, unit, expiresAt, addedAt }
+  // id는 DB의 fridge_items.id (알림 이력 notification_logs에서 사용, 추가 직후 잠깐 null)
   const [fridgeData, setFridgeData] = useState({ userId: null, items: EMPTY_LIST });
 
   // 지금 로그인한 계정의 목록일 때만 보여주기 (로그아웃·다른 계정이면 빈 목록)
@@ -72,7 +73,7 @@ export function UserDataProvider({ children }) {
 
     supabase
       .from('fridge_items')
-      .select('ingredient_id, quantity, unit, expires_at, created_at')
+      .select('id, ingredient_id, quantity, unit, expires_at, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false }) // 최근에 넣은 게 앞
       .order('id', { ascending: true })
@@ -90,6 +91,7 @@ export function UserDataProvider({ children }) {
         const items = [];
         for (const row of data) {
           items.push({
+            id: row.id,
             ingredientId: row.ingredient_id,
             // NUMERIC 칸은 문자열로 올 수 있어서 숫자로 바꿈
             quantity: row.quantity === null ? null : Number(row.quantity),
@@ -258,21 +260,46 @@ export function UserDataProvider({ children }) {
       if (isInFridge(ingredientId)) {
         throw new Error('이미 냉장고에 있는 재료입니다.');
       }
-      if (!userId || !supabase) return;
+      if (!userId || !supabase) return false;
 
       // 화면 맨 앞에 먼저 넣기
-      const newItem = { ingredientId, quantity, unit, expiresAt, addedAt: nowIso() };
+      const newItem = { id: null, ingredientId, quantity, unit, expiresAt, addedAt: nowIso() };
       setFridgeData((prev) => ({ userId, items: [newItem, ...itemsOf(prev, userId)] }));
 
-      // DB에 저장
-      const { error } = await supabase.from('fridge_items').insert({
-        user_id: userId,
-        ingredient_id: ingredientId,
-        quantity,
-        unit,
-        expires_at: expiresAt,
-      });
-      handleSaveError(error);
+      // DB에 저장하고, 새로 만들어진 id를 받아오기
+      const { data, error } = await supabase
+        .from('fridge_items')
+        .insert({
+          user_id: userId,
+          ingredient_id: ingredientId,
+          quantity,
+          unit,
+          expires_at: expiresAt,
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        // 저장에 실패하면 화면에 먼저 넣었던 재료를 바로 빼기
+        // (남겨 두면 다시 시도할 때 "이미 냉장고에 있음"으로 보여 저장을 건너뛰게 됨)
+        setFridgeData((prev) => ({
+          userId,
+          items: itemsOf(prev, userId).filter((item) => item !== newItem),
+        }));
+        handleSaveError(error);
+        return false;
+      }
+
+      // 화면에 먼저 넣어둔 항목에 DB id 채우기 (알림 기록 notification_logs 에서 사용)
+      setFridgeData((prev) => ({
+        userId,
+        items: itemsOf(prev, userId).map((item) =>
+          item.ingredientId === ingredientId ? { ...item, id: data.id } : item,
+        ),
+      }));
+
+      // 저장에 성공하면 true, 실패하면 false (장보기에서 옮길 때 성공한 것만 지우려고)
+      return true;
     },
     [isInFridge, userId, handleSaveError],
   );

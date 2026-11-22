@@ -42,10 +42,17 @@
 }
 
 .icon {
+  display: grid;
   width: 44px;
   height: 44px;
+  place-items: center;
   border-radius: 12px;
   background: #202124;
+}
+
+.icon img {
+  width: 26px;
+  height: 26px;
 }
 
 .rightBox {

@@ -8,7 +8,14 @@ import styles from '../components/fridge/FridgePage.module.css';
 import { useUserData } from '../contexts/UserDataContext.jsx';
 import FridgeAdd from '../components/fridge/FridgeAdd.jsx';
 import { getExpiryInfo } from '../utils/getExpiryInfo.js';
+import { useExpiryNotification } from '../hooks/useExpiryNotification.js';
 import { useState } from 'react';
+
+// 브라우저 알림 권한 처음 값 ('granted' | 'denied' | 'default', 지원 안 하면 'unsupported')
+const getNotificationPermission = () => {
+  if (!('Notification' in window)) return 'unsupported';
+  return Notification.permission;
+};
 
 function FridgePage() {
   const { fridgeIngredients } = useUserData();
@@ -21,6 +28,9 @@ function FridgePage() {
   const [searchText, setSearchText] = useState('');
   const [category, setCategory] = useState('전체');
   const [sortType, setSortType] = useState('최근 추가순');
+
+  // 알림 권한 (배너에서 허용 누르면 바뀜 → 바로 알림 확인)
+  const [notificationPermission, setNotificationPermission] = useState(getNotificationPermission);
 
   // 1. 냉장고 항목에 재료 정보(이름, 카테고리, 이미지) 붙이기
   /* 형식 :
@@ -58,6 +68,9 @@ function FridgePage() {
       soonCount++;
     }
   }
+
+  // 소비기한 임박·당일·만료 재료 크롬 알림 (같은 알림은 한 번만)
+  useExpiryNotification(fridgeList, notificationPermission);
 
   // 3. 카테고리 탭 옆에 보여줄 개수 세기 { 채소: 6, 육류: 1, ... }
   const categoryCounts = {};
@@ -122,7 +135,7 @@ function FridgePage() {
           setModalMode('add');
         }}
       />
-      <FridgeAlert />
+      <FridgeAlert onPermissionChange={setNotificationPermission} />
 
       <FridgeFilter
         searchText={searchText}

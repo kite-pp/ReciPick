@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import profileAvatar from '../../assets/common/profile-avatar.png';
+import profileAvatar from '../../assets/common/default-avatar.svg';
 import { ROUTES } from '../../constants/routes.js';
 import {
   countAddedThisWeek,

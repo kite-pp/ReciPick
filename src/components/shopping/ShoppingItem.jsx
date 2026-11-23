@@ -1,5 +1,6 @@
 import styles from './ShoppingItem.module.css';
 import { useUserData } from '../../contexts/UserDataContext.jsx';
+import IngredientIcon from '../common/IngredientIcon.jsx';
 
 function ShoppingItem({ item, ingredient }) {
   const { ingredientId, checked } = item;
@@ -20,6 +21,7 @@ function ShoppingItem({ item, ingredient }) {
     <li className={styles.item}>
       <label className={styles.checkLabel}>
         <input type="checkbox" checked={checked} onChange={handleToggle} />
+        <IngredientIcon ingredient={ingredient} size={32} />
         <span className={checked ? `${styles.name} ${styles.checked}` : styles.name}>{name}</span>
       </label>
 

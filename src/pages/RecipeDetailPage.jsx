@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import Badge from '../components/common/Badge.jsx';
 import Button from '../components/common/Button.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
+import IngredientIcon from '../components/common/IngredientIcon.jsx';
 import RecipeCard from '../components/common/RecipeCard.jsx';
 import { ROUTES } from '../constants/routes.js';
 import { useAuth } from '../contexts/useAuth.js';
@@ -252,9 +253,15 @@ function RecipeDetailPage() {
                   <ul className={styles.itemList}>
                     {match.ownedIngredients.map((item) => (
                       <li key={item.ingredientId} className={styles.item}>
-                        <span>
-                          <strong className={styles.itemName}>{getName(item)}</strong>
-                          <span className={styles.itemAmount}>{item.amount}</span>
+                        <span className={styles.itemMain}>
+                          <IngredientIcon
+                            ingredient={ingredientMap.get(item.ingredientId)}
+                            size={32}
+                          />
+                          <span>
+                            <strong className={styles.itemName}>{getName(item)}</strong>
+                            <span className={styles.itemAmount}>{item.amount}</span>
+                          </span>
                         </span>
                         <span className={styles.itemAmount}>
                           {getDDay(expiresMap.get(item.ingredientId))}
@@ -275,9 +282,15 @@ function RecipeDetailPage() {
                   <ul className={styles.itemList}>
                     {match.missingIngredients.map((item) => (
                       <li key={item.ingredientId} className={styles.item}>
-                        <span>
-                          <strong className={styles.itemName}>{getName(item)}</strong>
-                          <span className={styles.itemAmount}>필요량: {item.amount}</span>
+                        <span className={styles.itemMain}>
+                          <IngredientIcon
+                            ingredient={ingredientMap.get(item.ingredientId)}
+                            size={32}
+                          />
+                          <span>
+                            <strong className={styles.itemName}>{getName(item)}</strong>
+                            <span className={styles.itemAmount}>필요량: {item.amount}</span>
+                          </span>
                         </span>
                         <Button
                           size="small"
@@ -310,7 +323,10 @@ function RecipeDetailPage() {
               <ul className={styles.groupList}>
                 {mainList.map((item) => (
                   <li key={item.ingredientId}>
-                    <span>{item.info?.name}</span>
+                    <span className={styles.itemMain}>
+                      <IngredientIcon ingredient={item.info} size={24} />
+                      {item.info?.name}
+                    </span>
                     <span>{item.amount}</span>
                   </li>
                 ))}
@@ -327,7 +343,10 @@ function RecipeDetailPage() {
               <ul className={styles.groupList}>
                 {seasoningList.map((item) => (
                   <li key={item.ingredientId}>
-                    <span>{item.info?.name}</span>
+                    <span className={styles.itemMain}>
+                      <IngredientIcon ingredient={item.info} size={24} />
+                      {item.info?.name}
+                    </span>
                     <span>{item.amount}</span>
                   </li>
                 ))}

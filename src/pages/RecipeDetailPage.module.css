@@ -363,3 +363,9 @@
     font-size: var(--font-size-xl);
   }
 }
+
+.itemMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

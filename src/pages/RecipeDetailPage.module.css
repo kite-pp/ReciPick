@@ -61,6 +61,16 @@
   font-size: var(--font-size-md);
 }
 
+.excludedWarning {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

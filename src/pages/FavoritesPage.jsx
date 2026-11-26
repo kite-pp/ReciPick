@@ -59,9 +59,15 @@ function FavoritesPage() {
     }
   }
 
+  // 고른 카테고리의 찜이 모두 사라졌으면 '전체'로 보여주기 (#103)
+  let activeCategory = '전체';
+  if (categoryOptions.some((option) => option.name === category)) {
+    activeCategory = category;
+  }
+
   // 1. 카테고리 + 즉시 조리 가능만 걸러내기
   const filteredRecipes = favoriteRecipes.filter((recipe) => {
-    if (category !== '전체' && recipe.category !== category) return false;
+    if (activeCategory !== '전체' && recipe.category !== activeCategory) return false;
     if (onlyCookable && !matchById[recipe.id].isCookable) return false;
     return true;
   });
@@ -96,6 +102,14 @@ function FavoritesPage() {
       setSelectedIds(sortedRecipes.map((recipe) => recipe.id));
     }
     setMessage('');
+  };
+
+  // 하트 클릭: 찜 해제할 때는 선택 목록에서도 빼기 (#103)
+  const handleFavoriteClick = (recipeId) => {
+    if (isFavorite(recipeId)) {
+      setSelectedIds(selectedIds.filter((id) => id !== recipeId));
+    }
+    toggleFavorite(recipeId);
   };
 
   // 선택한 레시피의 부족한 재료를 장보기 목록에 한 번에 담기
@@ -192,7 +206,7 @@ function FavoritesPage() {
           <div className={styles.toolbar}>
             <div className={styles.categoryList}>
               {categoryOptions.map((option) => {
-                const isActive = option.name === category;
+                const isActive = option.name === activeCategory;
                 return (
                   <button
                     key={option.name}
@@ -258,7 +272,7 @@ function FavoritesPage() {
                     recipe={recipe}
                     {...getCardMatchProps(recipe)}
                     isFavorite={isFavorite(recipe.id)}
-                    onFavoriteClick={() => toggleFavorite(recipe.id)}
+                    onFavoriteClick={() => handleFavoriteClick(recipe.id)}
                   />
                 </div>
               ))}

@@ -13,11 +13,13 @@ import {
 import { useAuth } from '../../contexts/useAuth.js';
 import { useUserData } from '../../contexts/UserDataContext.jsx';
 import styles from './Layout.module.css';
+import { ingredients } from '../../data/ingredients.js';
+import { getExpiryNotificationTargets } from '../../utils/expiryNotification.js';
 
 function Header() {
   const location = useLocation();
   const { user, isLoggedIn, isLoading, logout } = useAuth();
-  const { shoppingList } = useUserData();
+  const { shoppingList, fridgeIngredients } = useUserData();
 
   // 헤더에 보여줄 이름 (닉네임 없으면 이메일 앞부분)
   let userName = '';
@@ -35,6 +37,22 @@ function Header() {
   if (notBoughtCount > 9) {
     cartBadgeText = '9+';
   }
+
+  // 알림 빨간 점: 소비기한 임박·당일·만료 재료가 있을 때만 표시
+  // 냉장고 항목에 재료 정보 붙이기 (FridgePage 와 같은 방식)
+  const fridgeList = [];
+  for (const item of fridgeIngredients) {
+    const ingredient = ingredients.find((ingredient) => {
+      return ingredient.id === item.ingredientId;
+    });
+
+    if (ingredient) {
+      fridgeList.push({ ...item, ingredient: ingredient });
+    }
+  }
+
+  const notificationTargets = getExpiryNotificationTargets(fridgeList);
+  const hasNotification = notificationTargets.length > 0;
 
   // 로그인 후에 지금 보던 페이지로 돌아오도록 현재 주소를 같이 넘김
   let loginState = undefined;
@@ -96,10 +114,16 @@ function Header() {
             {/* 로그인 했을 때 */}
             {!isLoading && isLoggedIn && (
               <>
-                <button className={styles['icon-button']} type="button" aria-label="알림 확인">
+                <Link
+                  className={styles['icon-button']}
+                  to={ROUTES.fridge}
+                  aria-label={hasNotification ? '소비기한 알림 있음, 냉장고로 이동' : '알림 확인'}
+                >
                   <img src={bellIcon} alt="" />
-                  <span className={styles['icon-button__dot']} aria-hidden="true" />
-                </button>
+                  {hasNotification && (
+                    <span className={styles['icon-button__dot']} aria-hidden="true" />
+                  )}
+                </Link>
                 <Link
                   className={styles['icon-button']}
                   to={ROUTES.shoppingList}

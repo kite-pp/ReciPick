@@ -220,13 +220,13 @@
 
 .icon-button__dot {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 7px;
-  height: 7px;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
   border: 2px solid #fff;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: red;
 }
 
 /* 장바구니 개수 배지 */

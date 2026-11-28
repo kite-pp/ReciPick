@@ -1,5 +1,7 @@
 -- #54 Supabase 테이블·RLS 실환경 확인용 조회 쿼리 (읽기 전용)
 -- Supabase Dashboard > SQL Editor에서 실행하고 결과를 이슈에 기록합니다.
+-- SQL Editor는 여러 문장을 한 번에 실행하면 마지막 결과만 보여 줄 수 있으므로,
+-- 아래 쿼리를 하나씩 선택해 실행(Run selected)하고 결과를 각각 기록합니다.
 
 -- 1. 사용자 데이터 테이블과 RLS 활성화 여부 (6개 모두 rls_enabled = true 여야 함)
 SELECT c.relname AS table_name, c.relrowsecurity AS rls_enabled
@@ -9,7 +11,7 @@ WHERE n.nspname = 'public'
   AND c.relkind = 'r'
 ORDER BY c.relname;
 
--- 2. 정책 목록 (notification_logs만 SELECT, 나머지는 ALL)
+-- 2. 정책 목록 (notification_logs는 SELECT·INSERT 2개, 나머지는 ALL)
 SELECT tablename, policyname, cmd, roles, qual, with_check
 FROM pg_policies
 WHERE schemaname = 'public'

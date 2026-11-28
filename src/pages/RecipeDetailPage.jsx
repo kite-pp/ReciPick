@@ -304,7 +304,8 @@ function RecipeDetailPage() {
                             '담김'
                           ) : (
                             <>
-                              <img src={cartIcon} alt="" className={styles.cartIcon} /> 장보기에 담기
+                              <img src={cartIcon} alt="" className={styles.cartIcon} /> 장보기에
+                              담기
                             </>
                           )}
                         </Button>

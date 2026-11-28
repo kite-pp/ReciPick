@@ -97,12 +97,6 @@
   cursor: pointer;
 }
 
-/* 수량 0일 때 - 버튼 비활성화 */
-.quantityControl button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
 .quantityControl strong {
   min-width: 34px;
   color: #202124;

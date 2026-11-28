@@ -125,24 +125,10 @@ export function useProfileSettings(userId) {
     [userId],
   );
 
-  // 지금 로그인한 사용자의 설정일 때만 보여주기
-  // (로그아웃하거나 다른 계정으로 바뀌면 이전 계정 설정 대신 기본값을 돌려줌)
-  // loaded.key는 `${userId}:${reloadCount}` 모양이라 앞부분이 설정 주인의 id
-  let isCurrentUser = false;
-  if (userId && loaded.key) {
-    const loadedUserId = loaded.key.split(':')[0];
-    isCurrentUser = loadedUserId === userId;
-  }
-
-  let loadError = isCurrentUser ? loaded.error : '';
-  if (!supabase) {
-    loadError = 'Supabase 설정이 없어 설정을 불러올 수 없습니다.';
-  }
-
   return {
-    settings: isCurrentUser ? loaded.settings : DEFAULT_PROFILE_SETTINGS,
+    settings: loaded.settings,
     isLoading: Boolean(loadKey) && loaded.key !== loadKey,
-    loadError,
+    loadError: supabase ? loaded.error : 'Supabase 설정이 없어 설정을 불러올 수 없습니다.',
     saveError,
     isSaving: pendingSaves > 0,
     saveSettings,

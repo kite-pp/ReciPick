@@ -81,7 +81,6 @@ function FridgeModal({ ingredient, onClick }) {
         <div className={styles.quantityControl}>
           <button
             type="button"
-            disabled={quantity <= 0}
             onClick={(event) => {
               event.stopPropagation();
               handleDecrease();

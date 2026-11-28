@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import bellIcon from '../../assets/common/bell.svg';
 import cartIcon from '../../assets/common/cart.svg';
 import brandLogo from '../../assets/common/brand-logo.png';
-import profileAvatar from '../../assets/common/default-avatar.svg';
+import profileAvatar from '../../assets/common/profile-avatar.png';
 import searchIcon from '../../assets/common/search.svg';
 import {
   MOBILE_NAVIGATION_ITEMS,

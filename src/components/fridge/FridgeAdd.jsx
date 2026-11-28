@@ -3,6 +3,7 @@ import { ingredients } from '../../data/ingredients.js';
 import { INGREDIENT_UNITS } from '../../data/constants.js';
 import { useState } from 'react';
 import { useUserData } from '../../contexts/UserDataContext.jsx';
+import IngredientIcon from '../common/IngredientIcon.jsx';
 
 function FridgeAdd({ mode, ingredient, onClose }) {
   const { fridgeIngredients, addFridgeIngredient, updateFridgeIngredient } = useUserData();
@@ -27,6 +28,16 @@ function FridgeAdd({ mode, ingredient, onClose }) {
       });
     } else {
       if (!selectIngredient) return;
+
+      // 이미 냉장고에 있는 재료면 안내하고 저장하지 않기
+      const isAlreadyInFridge = fridgeIngredients.find((item) => {
+        return item.ingredientId === selectIngredient.id;
+      });
+
+      if (isAlreadyInFridge) {
+        alert('이미 냉장고에 있는 재료예요. 기존 카드에서 수량을 수정해 주세요.');
+        return;
+      }
 
       await addFridgeIngredient({
         ingredientId: selectIngredient.id,
@@ -84,7 +95,10 @@ function FridgeAdd({ mode, ingredient, onClose }) {
                       setIsClick(false);
                     }}
                   >
-                    <span>{ingredient.name}</span>
+                    <span className={styles.resultName}>
+                      <IngredientIcon ingredient={ingredient} size={28} />
+                      {ingredient.name}
+                    </span>
                     <span>{ingredient.category}</span>
                   </button>
                 ))}

@@ -99,6 +99,27 @@
   gap: 8px;
 }
 
+.matchIconImage {
+  width: 28px;
+  height: 28px;
+}
+
+.cartIcon {
+  width: 16px;
+  height: 16px;
+  vertical-align: -2px;
+  margin-right: 4px;
+  filter: brightness(0) invert(1);
+}
+
+.cartIconDark {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  filter: brightness(0);
+}
+
 /* 냉장고 일치 카드 */
 .matchHead {
   display: flex;

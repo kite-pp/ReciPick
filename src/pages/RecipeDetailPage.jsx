@@ -19,6 +19,8 @@ import {
   getUsableIngredientIds,
 } from '../utils/recommendation.js';
 import styles from './RecipeDetailPage.module.css';
+import fridgeIcon from '../assets/common/fridge.svg';
+import cartIcon from '../assets/common/cart.svg';
 
 const SIMILAR_RECIPE_COUNT = 3;
 const SEASONING_CATEGORY = '양념';
@@ -187,6 +189,7 @@ function RecipeDetailPage() {
               onClick={handleAddMissing}
               disabled={addableItems.length === 0}
             >
+              <img src={cartIcon} alt="" className={styles.cartIconDark} />
               {getShoppingButtonLabel()}
             </Button>
           </div>
@@ -206,7 +209,7 @@ function RecipeDetailPage() {
           <>
             <div className={styles.matchHead}>
               <span className={styles.matchIcon} aria-hidden="true">
-                🧊
+                <img src={fridgeIcon} alt="" className={styles.matchIconImage} />
               </span>
               <div>
                 <div className={styles.matchTitleRow}>
@@ -297,7 +300,13 @@ function RecipeDetailPage() {
                           onClick={() => handleAddOne(item.ingredientId)}
                           disabled={isInShoppingList(item.ingredientId)}
                         >
-                          {isInShoppingList(item.ingredientId) ? '담김' : '🛒 장보기에 담기'}
+                          {isInShoppingList(item.ingredientId) ? (
+                            '담김'
+                          ) : (
+                            <>
+                              <img src={cartIcon} alt="" className={styles.cartIcon} /> 장보기에 담기
+                            </>
+                          )}
                         </Button>
                       </li>
                     ))}

@@ -6,8 +6,15 @@ import { recipes } from '../../data/recipes.js';
 import { useUserData } from '../../contexts/UserDataContext.jsx';
 import { getRecommendations } from '../../utils/recommendation.js';
 
+import { useAuth } from '../../contexts/useAuth.js';
+import { useProfileSettings } from '../../hooks/useProfileSettings.js';
+
 function FridgeRecommend() {
   const { fridgeIngredients } = useUserData();
+
+  const { user } = useAuth();
+
+  const { settings: profileSettings } = useProfileSettings(user?.id);
 
   // #41 추천 함수로 일치율 높은 레시피 3개 가져오기
   // 형식 : [{ recipe, matchRate, ownedIngredients, missingIngredients, isCookable }]
@@ -15,6 +22,8 @@ function FridgeRecommend() {
     recipes,
     fridgeIngredients,
     limit: 3,
+    excludedIngredientIds: profileSettings.excludedIngredientIds,
+    preferredCategories: profileSettings.preferredCategories,
   });
 
   return (
